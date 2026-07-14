@@ -3,36 +3,18 @@
   © Jan den Hollander — jandenhollander@duck.com
   GitHub: https://github.com/Jan-den-Hollander
   Projectnaam: VisLog
-  Versie: 2.0 | Datum: 2026-07-10
+  Versie: 2.1 | Datum: 2026-07-13
 
   LICENTIE / LICENSE (NL | EN | IT)
-  ──────────────────────────────────────────────────────────────────────────────
-  NL: Dit werk is auteursrechtelijk beschermd. Het mag vrij worden gebruikt,
-  gedeeld en verspreid, uitsluitend voor niet-commerciële doeleinden en
-  uitsluitend in ongewijzigde vorm, met vermelding van de oorspronkelijke
-  auteur. Commercieel gebruik, wijziging, verkoop of integratie in betaalde
-  producten of diensten is uitdrukkelijk verboden zonder schriftelijke
-  toestemming van de auteur. Hulp is en blijft gratis.
+  NL: Dit werk is auteursrechtelijk beschermd. Vrij te gebruiken, delen en
+  verspreiden voor niet-commerciële doeleinden, ongewijzigd, met vermelding
+  van de oorspronkelijke auteur. Commercieel gebruik verboden zonder
+  toestemming. Hulp is en blijft gratis.
+  EN: This work is protected by copyright. Free to use, share and distribute
+  for non-commercial purposes only, unmodified, with attribution.
+  IT: Quest'opera è protetta da diritto d'autore. Uso libero, non commerciale.
 
-  EN: This work is protected by copyright. It may be freely used, shared and
-  distributed for non-commercial purposes only, in unmodified form, with
-  attribution to the original author. Commercial use, modification, sale or
-  integration into paid products or services is strictly prohibited without
-  prior written consent of the author. Help is and remains free.
-
-  IT: Quest'opera è protetta da diritto d'autore. Può essere liberamente
-  utilizzata, condivisa e distribuita esclusivamente per scopi non commerciali,
-  nella sua forma originale e non modificata, con attribuzione all'autore
-  originale. L'uso commerciale è vietato senza consenso scritto dell'autore.
-
-  Originele broncode / Original source / Fonte originale:
-  https://github.com/Jan-den-Hollander
-
-  Alle rechten voorbehouden / All rights reserved / Tutti i diritti riservati
-  © Jan den Hollander
-================================================================================
-  ⚠️ INTEGRITEITSWAARSCHUWING: dit bestand bevat een integriteitscontrole op
-  projectnaam, footer en modal. Verwijdering of wijziging blokkeert de app.
+  Originele broncode: https://github.com/Jan-den-Hollander
 ================================================================================
 -->
 <!DOCTYPE html>
@@ -239,6 +221,7 @@ canvas{display:none;}
     <div class="weer-groep" data-i18n="weer.algemeen">Wind &amp; luchtdruk (Benelux breed)</div>
     <a class="weer-link" href="https://www.windy.com" target="_blank" rel="noopener">&#128168; Windy — <span data-i18n="weer.windy">wind, druk, golfhoogte</span></a>
     <a class="weer-link" href="https://www.windfinder.com" target="_blank" rel="noopener">&#128168; Windfinder — <span data-i18n="weer.windfinder">wind per locatie</span></a>
+    <a class="weer-link" href="https://app.shadowmap.org/?lat=51.87450&lng=5.39788&zoom=18.44&azimuth=-2.53497&basemap=map&elevation=nextzen&f=29.0&hud=true&polar=0.52360&sunVector=&time=1783850498206&vq=2" target="_blank" rel="noopener">&#127772; Shadowmap — <span data-i18n="weer.shadowmap">zon/schaduw simulatie per locatie &amp; tijdstip</span></a>
   </div>
 </div>
 
@@ -363,7 +346,7 @@ canvas{display:none;}
   <div class="export-card">
     <div style="font-size:2rem;margin-bottom:8px">&#128196;</div>
     <div class="sectie-titel" data-i18n="export.csvTitel">CSV &mdash; alle vangsten</div>
-    <div class="export-desc" data-i18n="export.csvDesc">Per vangst: datum, soort, watertype, lengte, gewicht, locatie, omstandigheden, hengel, aas, moeilijkheidsgraad, score.</div>
+    <div class="export-desc" data-i18n="export.csvDesc">Per vangst: datum, soort, watertype, lengte, gewicht, locatie, omstandigheden, hengel, aas, moeilijkheidsgraad, score.⚠️ Soortnamen in de CSV staan altijd in het Nederlands, ook als je de vangst in het Italiaans hebt ingevoerd — handig voor consistente data, maar vergelijk zelf even met een soortenlijst.</div>
     <button class="btn btn-primair" onclick="exporteerCSV()"><span data-i18n="export.csvBtn">&#8595; Download CSV</span></button>
   </div>
   <div class="export-card">
@@ -402,7 +385,7 @@ var TR = {
     start:{visser:'&#128100; Visser',visserPh:'Jouw naam',sessie:'Sessie / Locatie',sessiePh:'bijv. Grevelingenmeer noordoever',datum:'Datum',gps:'GPS-startpunt',gpsNietbepaald:'Nog niet bepaald',startBtn:'&#9654; Start nieuwe sessie',werkwijzeTitel:'Werkwijze',
       werkwijzeTekst:'<strong>1. Start</strong> &#8594; naam, locatie, GPS, sessie starten<br><strong>2. Vangst</strong> &#8594; foto + soort + meetgegevens per vis<br><strong>3. Log</strong> &#8594; overzicht van deze sessie op kaart<br><strong>4. Kaart</strong> &#8594; vergunning-info per land + eigen stekken<br><strong>5. Top</strong> &#8594; Hall of Fame, beste vangsten ooit<br><strong>6. Export</strong> &#8594; CSV van al je vangsten'},
     weer:{titel:'&#127768;&#65039; Weer &amp; water (gratis bronnen)',nl:'Nederland',be:'België',lux:'Luxemburg',algemeen:'Wind &amp; luchtdruk (Benelux breed)',
-      buienradar:'neerslag &amp; wind',knmi:'weerbericht',waterinfoNl:'waterstand &amp; getij',meteobe:'weerbericht',waterinfoBe:'waterstand',meteolux:'weerbericht',windy:'wind, druk, golfhoogte',windfinder:'wind per locatie'},
+      buienradar:'neerslag &amp; wind',knmi:'weerbericht',waterinfoNl:'waterstand &amp; getij',meteobe:'weerbericht',waterinfoBe:'waterstand',meteolux:'weerbericht',windy:'wind, druk, golfhoogte',windfinder:'wind per locatie',shadowmap:'zon/schaduw simulatie per locatie &amp; tijdstip'},
     vangst:{tipsBtn:'&#128247; Determinatietips &#8250;',soortLabel:'&#128031; Vissoort',onbekendHint:'Onbekende soort &#8594; deel de foto met een AI-app en plak het antwoord terug.',deelBtn:'&#8679; Deel foto',kopieerBtn:'&#128203; Kopieer prompt',plakPh:'Plak hier het antwoord van de AI...',naamLabel:'Vermoedelijke soortnaam:',naamPh:'bijv. Roofblei',
       schaalLabel:'&#128207; Maatreferentie in beeld (optioneel)',schaalHint:'Voor exacte lengte: gebruik een rolmaat en vul die hieronder in. Geen rolmaat bij de hand? Leg dan dit in beeld:',opnieuw:'&#8617; Opnieuw',
       watertypeLabel:'Watertype',maatLabel:'Lengte (cm) &amp; gewicht (gram, optioneel)',lengtePh:'Lengte cm',gewichtPh:'Gewicht g',
@@ -435,9 +418,9 @@ var TR = {
     start:{visser:'&#128100; Pescatore',visserPh:'Il tuo nome',sessie:'Sessione / Località',sessiePh:'es. Grevelingenmeer sponda nord',datum:'Data',gps:'Punto GPS iniziale',gpsNietbepaald:'Non ancora determinato',startBtn:'&#9654; Avvia nuova sessione',werkwijzeTitel:'Come funziona',
       werkwijzeTekst:'<strong>1. Inizio</strong> &#8594; nome, località, GPS, avvia sessione<br><strong>2. Cattura</strong> &#8594; foto + specie + dati per pesce<br><strong>3. Diario</strong> &#8594; panoramica della sessione sulla mappa<br><strong>4. Mappa</strong> &#8594; info licenze per paese + tuoi spot<br><strong>5. Top</strong> &#8594; Hall of Fame, le catture migliori<br><strong>6. Esporta</strong> &#8594; CSV di tutte le catture'},
     weer:{titel:'&#127768;&#65039; Meteo &amp; acqua (fonti gratuite)',nl:'Paesi Bassi',be:'Belgio',lux:'Lussemburgo',algemeen:'Vento &amp; pressione (Benelux)',
-      buienradar:'pioggia &amp; vento',knmi:'previsioni',waterinfoNl:'livello acqua &amp; maree',meteobe:'previsioni',waterinfoBe:'livello acqua',meteolux:'previsioni',windy:'vento, pressione, onde',windfinder:'vento per località'},
-    vangst:{tipsBtn:'&#128247; Consigli di determinazione &#8250;',soortLabel:'&#128031; Specie di pesce',onbekendHint:'Specie sconosciuta &#8594; condividi la foto con un\'app AI e incolla la risposta.',deelBtn:'&#8679; Condividi foto',kopieerBtn:'&#128203; Copia prompt',plakPh:'Incolla qui la risposta dell\'AI...',naamLabel:'Nome specie presunto:',naamPh:'es. Abramide',
-      schaalLabel:'&#128207; Riferimento di scala nella foto (opzionale)',schaalHint:'Per la lunghezza esatta: usa un metro a nastro e inseriscilo sotto. Non ce l\'hai a portata di mano? Metti questo nell\'inquadratura:',opnieuw:'&#8617; Di nuovo',
+      buienradar:'pioggia &amp; vento',knmi:'previsioni',waterinfoNl:'livello acqua &amp; maree',meteobe:'previsioni',waterinfoBe:'livello acqua',meteolux:'previsioni',windy:'vento, pressione, onde',windfinder:'vento per località',shadowmap:'simulazione sole/ombra per posizione &amp; orario'},
+    vangst:{tipsBtn:'&#128247; Consigli di determinazione &#8250;',soortLabel:'&#128031; Specie di pesce',onbekendHint:'Specie sconosciuta &#8594; condividi la foto con un app AI e incolla la risposta.',deelBtn:'&#8679; Condividi foto',kopieerBtn:'&#128203; Copia prompt',plakPh:'Incolla qui la risposta dell AI...',naamLabel:'Nome specie presunto:',naamPh:'es. Abramide',
+      schaalLabel:'&#128207; Riferimento di scala nella foto (opzionale)',schaalHint:'Per la lunghezza esatta: usa un metro a nastro e inseriscilo sotto. Non ce l hai a portata di mano? Metti questo nell inquadratura:',opnieuw:'&#8617; Di nuovo',
       watertypeLabel:'Tipo di acqua',maatLabel:'Lunghezza (cm) &amp; peso (grammi, opzionale)',lengtePh:'Lunghezza cm',gewichtPh:'Peso g',
       stromingLabel:'Corrente',helderheidLabel:'Limpidezza',waterLabel:'Acqua',vanafLabel:'Pescato da',bootPh:'es. nome noleggio, o barca a remi/motore propria',
       moeilijkheidLabel:'Difficoltà della cattura',tegenstandLabel:'Resistenza del pesce',hengelLabel:'Canna',hengelPh:'es. canna da carpa 3.6m / canna da spinning',
@@ -445,22 +428,22 @@ var TR = {
     schaal:{rolmaat:'Metro a nastro',lineaal:'Righello',sleutels:'Chiavi',bankpas:'Carta bancaria',hand:'Mano',geen:'Nessuno',customPh:'oppure scrivi tu, es. numero scarpa 43'},
     chip:{zoet:'Acqua dolce',brak:'Acqua salmastra',zeewater:'Acqua di mare',stil:'Ferma',stromend:'Corrente',helder:'Limpida',troebel:'Torbida',klein:'Piccolo fiume/fosso',groot:'Grande fiume',meer:'Lago/laghetto',oever:'Riva',brug:'Ponte',boot:'Barca',makkelijk:'Facile',gemiddeld:'Media',moeilijk:'Difficile',weinig:'Poca',veel:'Molta'},
     log:{vangsten:'catture',soorten:'specie',zwaarste:'g più pesante',kaartTitel:'Posizioni catture',kaartGeen:'&#128506;<br>Ancora nessun punto GPS',geen:'Ancora nessuna cattura in questa sessione'},
-    kaart:{vergunningTitel:'Licenze Benelux',nlTitel:'Paesi Bassi',nlTekst:'VISpas (nazionale, tramite le federazioni di pesca/sportvisserijnederland.nl) oppure Kleine VISpas per un\'acqua specifica. Controlla sempre la Lijst van Nederlandse Wateren — alcune acque hanno regole aggiuntive o divieto di pesca notturna.',
-      vlTitel:'Fiandre',vlTekst:'Licenza di pesca (tassa) tramite il governo fiammingo, più il permesso del proprietario/federazione (es. VVF Vlaanderen) per l\'acqua specifica.',
-      waTitel:'Vallonia',waTekst:'Permis de pêche tramite il Service Public de Wallonie, più eventualmente l\'iscrizione all\'associazione di pesca locale.',
-      luxTitel:'Lussemburgo',luxTekst:'Permis de pêche tramite l\'Administration de la nature et des forêts, insieme alla "carte de pêche" dell\'associazione competente.',
+    kaart:{vergunningTitel:'Licenze Benelux',nlTitel:'Paesi Bassi',nlTekst:'VISpas (nazionale, tramite le federazioni di pesca/sportvisserijnederland.nl) oppure Kleine VISpas per un acqua specifica. Controlla sempre la Lijst van Nederlandse Wateren — alcune acque hanno regole aggiuntive o divieto di pesca notturna.',
+      vlTitel:'Fiandre',vlTekst:'Licenza di pesca (tassa) tramite il governo fiammingo, più il permesso del proprietario/federazione (es. VVF Vlaanderen) per l acqua specifica.',
+      waTitel:'Vallonia',waTekst:'Permis de pêche tramite il Service Public de Wallonie, più eventualmente l iscrizione all associazione di pesca locale.',
+      luxTitel:'Lussemburgo',luxTekst:'Permis de pêche tramite l Administration de la nature et des forêts, insieme alla "carte de pêche" dell associazione competente.',
       disclaimer:'&#9888; Le regole cambiano ogni anno &mdash; verifica sempre le condizioni attuali.',stekkenTitel:'I tuoi spot',spotNieuw:'Nuovo spot',spotGoed:'Buono spot',notitiePh:'nota, es. molti lucioperca avvistati',markeerBtn:'&#128205; Segna posizione attuale',geenStekken:'&#128506;<br>Ancora nessuno spot segnato'},
     hof:{titel:'&#127942; Hall of Fame &mdash; catture migliori',geen:'Ancora nessuna cattura registrata'},
     export:{csvTitel:'CSV &mdash; tutte le catture',csvDesc:'Per cattura: data, specie, tipo acqua, lunghezza, peso, posizione, condizioni, canna, esca, difficoltà, punteggio.⚠️ I nomi delle specie nel CSV sono sempre in olandese, anche se hai inserito la cattura in italiano — utile per dati coerenti, ma confronta tu stesso con un elenco delle specie.',csvBtn:'&#8595; Scarica CSV',
       spotsTitel:'CSV &mdash; spot',spotsDesc:'Tutti i tuoi spot nuovi e buoni segnati, con GPS e note.',spotsBtn:'&#8595; Scarica spot',
       sessieLabel:'Sessione attuale',wisSessie:'&#10005; Cancella sessione attuale',wisAlles:'&#10005; Cancella tutti i dati (incl. archivio e spot)'},
     modal:{titel:'&#128247; Consigli di determinazione',kenmerkenTitel:'&#128269; Caratteristiche riconoscibili',kenmerkenTekst:'Fotografa il pesce di lato, interamente inquadrato. Osserva forma delle pinne, colore, muso e squame.',
-      maatTitel:'&#128207; Riferimento di scala',maatTekst:'Per una lunghezza esatta usa un metro a nastro. Non ce l\'hai a portata di mano? Metti in foto un oggetto riconoscibile (chiavi, carta, mano).',
+      maatTitel:'&#128207; Riferimento di scala',maatTekst:'Per una lunghezza esatta usa un metro a nastro. Non ce l hai a portata di mano? Metti in foto un oggetto riconoscibile (chiavi, carta, mano).',
       twijfelTitel:'&#127754; Caso dubbio?',twijfelTekst:'Scegli "Sconosciuto / nuovo per me" nella specie — otterrai il flusso di determinazione AI.',terugBtn:'&#128247; Torna alla foto'},
     notif:{vulLocatie:'Inserisci un nome di località',sessieGestart:'Sessione avviata',gpsZoeken:'Ricerca...',gpsBepaald:'GPS determinato \u2713',gpsMislukt:'GPS fallito',gpsGeweigerd:'Permesso negato',gpsGeenSignaal:'Segnale non trovato',gpsTimeout:'Timeout',
-      startSessieEerst:'Avvia prima una sessione',kiesSoort:'Scegli o inserisci una specie',kiesWatertype:'Scegli un tipo di acqua',vangstOpgeslagen:'Cattura salvata \u2713 (punteggio ',promptGekopieerd:'Prompt copiato \u2713',kopieerHandmatig:'Copia manualmente',makEerstFoto:'Scatta prima una foto',delenMislukt:'Condivisione fallita',fotoGedownload:'Foto scaricata \u2014 apri nell\'app AI',
+      startSessieEerst:'Avvia prima una sessione',kiesSoort:'Scegli o inserisci una specie',kiesWatertype:'Scegli un tipo di acqua',vangstOpgeslagen:'Cattura salvata \u2713 (punteggio ',promptGekopieerd:'Prompt copiato \u2713',kopieerHandmatig:'Copia manualmente',makEerstFoto:'Scatta prima una foto',delenMislukt:'Condivisione fallita',fotoGedownload:'Foto scaricata \u2014 apri nell app AI',
       stekGemarkeerd:'Spot segnato \u2713',geenVangsten:'Nessuna cattura',geenStekken:'Nessuno spot',csvGedownload:'CSV scaricato \u2713',stekkenGedownload:'Spot scaricati \u2713',sessieGewist:'Sessione cancellata',allesGewist:'Tutti i dati cancellati',
-      confirmWisSessie:'Cancellare la sessione e le catture attuali? Esporta prima!',confirmWisAlles:'Cancellare TUTTI i dati, incluso l\'archivio Hall of Fame e gli spot? Non può essere annullato.',cameraFout:'Fotocamera: '}
+      confirmWisSessie:'Cancellare la sessione e le catture attuali? Esporta prima!',confirmWisAlles:'Cancellare TUTTI i dati, incluso l archivio Hall of Fame e gli spot? Non può essere annullato.',cameraFout:'Fotocamera: '}
   }
 };
 
@@ -877,7 +860,6 @@ function verwijderAlles(){
 function toonNotif(txt){ var n=document.getElementById('notif'); n.textContent=txt; n.classList.add('zichtbaar'); setTimeout(function(){n.classList.remove('zichtbaar');},2400); }
 </script>
 
-<!-- ① ZICHTBARE FOOTER -->
 <div id="jdh-copyright-footer" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.82);color:#ccc;font-size:11px;text-align:center;padding:4px 8px;z-index:99999;font-family:sans-serif;letter-spacing:0.3px;user-select:none;">
   © <span id="jdh-year"></span> Jan den Hollander &nbsp;|&nbsp;
   <span id="jdh-project-title" style="color:#7eb8f7"></span> &nbsp;|&nbsp;
@@ -885,20 +867,18 @@ function toonNotif(txt){ var n=document.getElementById('notif'); n.textContent=t
   <span style="color:#aaa; cursor:pointer; text-decoration:underline" onclick="document.getElementById('jdh-modal').style.display='flex'">ℹ️ Licentie</span>
 </div>
 
-<!-- ② LICENTIE MODAL -->
 <div id="jdh-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999999; align-items:center; justify-content:center;">
   <div style="background:#1a1a2e; color:#e0e0e0; border:1px solid #444; border-radius:10px; max-width:480px; width:90%; padding:24px; font-family:sans-serif; font-size:13px; line-height:1.6;">
     <h3 style="color:#7eb8f7; margin-top:0">© Jan den Hollander &nbsp;·&nbsp; <span id="jdh-modal-title" style="font-weight:normal;font-size:12px"></span></h3>
     <p>Dit hulpmiddel is <strong>gratis</strong> en mag vrij worden gedeeld, uitsluitend <strong>ongewijzigd</strong> en voor <strong>niet-commerciële</strong> doeleinden, met bronvermelding.</p>
-    <p>Commercieel gebruik, wijziging of verkoop is <strong>verboden</strong> zonder schriftelijke toestemming. Het gebruik van naam of projecttitel impliceert geen toestemming en vormt bij commercieel gebruik een zelfstandige auteursrechtinbreuk.</p>
-    <p style="color:#aaa;font-size:11px">This tool is free and may be shared freely, unmodified, for non-commercial purposes only, with attribution.<br><br>Quest'opera è gratuita e può essere condivisa liberamente, senza modifiche, per scopi non commerciali, con attribuzione.</p>
+    <p>Commercieel gebruik, wijziging of verkoop is <strong>verboden</strong> zonder schriftelijke toestemming.</p>
+    <p style="color:#aaa;font-size:11px">This tool is free and may be shared freely, unmodified, for non-commercial purposes only.<br><br>Quest'opera è gratuita e può essere condivisa liberamente, senza modifiche.</p>
     <p style="margin-bottom:4px">📧 <a href="mailto:jandenhollander@duck.com" style="color:#7eb8f7">jandenhollander@duck.com</a></p>
     <p style="margin-top:4px;margin-bottom:0">🔗 <a href="https://github.com/Jan-den-Hollander" target="_blank" style="color:#7eb8f7">github.com/Jan-den-Hollander</a></p>
     <button onclick="document.getElementById('jdh-modal').style.display='none'" style="margin-top:16px;padding:8px 20px;background:#7eb8f7;color:#000;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">Sluiten</button>
   </div>
 </div>
 
-<!-- ③ INTEGRITEITSCHECK + URL-CHECK -->
 <script>
 (function() {
   'use strict';
@@ -907,26 +887,14 @@ function toonNotif(txt){ var n=document.getElementById('notif'); n.textContent=t
   var titleEl = document.getElementById('jdh-project-title'); if (titleEl) titleEl.textContent = projectName;
   var modalTitleEl = document.getElementById('jdh-modal-title'); if (modalTitleEl) modalTitleEl.textContent = projectName;
 
-  // ── URL-check: toegestane domeinen voor VisLog ──────────────────────
-  var ALLOWED = [
-    'localhost','127.0.0.1',
-    'jan-den-hollander.github.io',
-    'vis-log-pesce.vercel.app',
-    'vislog.vercel.app',
-    'vislog',
-    'claude.ai','stackblitz.io','stackblitz.com'
-  ];
-
+  var ALLOWED = ['localhost','127.0.0.1','jan-den-hollander.github.io','vis-log-pesce.vercel.app','vislog.vercel.app','vislog','claude.ai','stackblitz.io','stackblitz.com'];
   function domainAllowed() {
     var host = window.location.hostname.toLowerCase();
     var proto = window.location.protocol;
     if (proto === 'file:' || proto === 'content:') return true;
     if (!host || host === '') return true;
-    return ALLOWED.some(function(a) {
-      return host === a || host.endsWith('.' + a) || host.indexOf(a) !== -1;
-    });
+    return ALLOWED.some(function(a) { return host === a || host.endsWith('.' + a) || host.indexOf(a) !== -1; });
   }
-
   function warnDomain() {
     var banner = document.createElement('div');
     banner.id = 'jdh-domain-warning';
@@ -934,43 +902,24 @@ function toonNotif(txt){ var n=document.getElementById('notif'); n.textContent=t
     banner.innerHTML = '⚠️ <strong>' + projectName + '</strong> draait op een niet-erkend domein (<em>' + window.location.hostname + '</em>). Origineel: <a href="https://github.com/Jan-den-Hollander" target="_blank" style="color:#ffccaa">github.com/Jan-den-Hollander</a> · <a href="mailto:jandenhollander@duck.com" style="color:#ffccaa">jandenhollander@duck.com</a>';
     document.body.insertBefore(banner, document.body.firstChild);
   }
-
   if (!domainAllowed()) { setTimeout(warnDomain, 800); }
 
   function blockApp() {
     document.body.innerHTML = '';
     document.body.style.cssText = 'margin:0;background:#111;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;';
-    document.body.innerHTML =
-      '<div style="text-align:center;color:#e55;max-width:440px;padding:24px">' +
-      '<div style="font-size:52px">⛔</div>' +
-      '<h2 style="color:#e55;margin:12px 0 8px">Toegang geblokkeerd</h2>' +
-      '<p style="color:#ddd;font-size:14px">De copyright-informatie van <strong style="color:#7eb8f7">' + projectName + '</strong> is verwijderd of gewijzigd.</p>' +
-      '<hr style="border-color:#333;margin:16px 0">' +
-      '<p style="color:#ccc;font-size:13px">© Jan den Hollander</p>' +
-      '<p><a href="mailto:jandenhollander@duck.com" style="color:#7eb8f7;font-size:12px">jandenhollander@duck.com</a></p>' +
-      '<p><a href="https://github.com/Jan-den-Hollander" target="_blank" style="color:#7eb8f7;font-size:12px">🔗 github.com/Jan-den-Hollander</a></p>' +
-      '</div>';
+    document.body.innerHTML = '<div style="text-align:center;color:#e55;max-width:440px;padding:24px"><div style="font-size:52px">⛔</div><h2 style="color:#e55;margin:12px 0 8px">Toegang geblokkeerd</h2><p style="color:#ddd;font-size:14px">De copyright-informatie van <strong style="color:#7eb8f7">' + projectName + '</strong> is verwijderd of gewijzigd.</p><hr style="border-color:#333;margin:16px 0"><p style="color:#ccc;font-size:13px">© Jan den Hollander</p><p><a href="mailto:jandenhollander@duck.com" style="color:#7eb8f7;font-size:12px">jandenhollander@duck.com</a></p><p><a href="https://github.com/Jan-den-Hollander" target="_blank" style="color:#7eb8f7;font-size:12px">🔗 github.com/Jan-den-Hollander</a></p></div>';
   }
-
   function checkIntegrity() {
     var footer = document.getElementById('jdh-copyright-footer');
     var modal  = document.getElementById('jdh-modal');
     if (!footer || !modal) { blockApp(); return; }
     var fs = window.getComputedStyle(footer);
-    if (fs.display === 'none' || fs.visibility === 'hidden' || fs.opacity === '0') {
-      footer.style.cssText += ';display:block!important;visibility:visible!important;opacity:1!important';
-    }
+    if (fs.display === 'none' || fs.visibility === 'hidden' || fs.opacity === '0') { footer.style.cssText += ';display:block!important;visibility:visible!important;opacity:1!important'; }
   }
-
   checkIntegrity();
   setInterval(checkIntegrity, 3000);
-
   var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(m) {
-      m.removedNodes.forEach(function(node) {
-        if (node.id === 'jdh-copyright-footer' || node.id === 'jdh-modal') blockApp();
-      });
-    });
+    mutations.forEach(function(m) { m.removedNodes.forEach(function(node) { if (node.id === 'jdh-copyright-footer' || node.id === 'jdh-modal') blockApp(); }); });
   });
   observer.observe(document.body, { childList: true, subtree: true });
 })();
