@@ -1,0 +1,987 @@
+<!--
+================================================================================
+  © Jan den Hollander — jandenhollander@duck.com
+  GitHub: https://github.com/Jan-den-Hollander
+  Projectnaam: VisLog
+  Versie: 2.0 | Datum: 2026-07-10
+
+  LICENTIE / LICENSE (NL | EN | IT)
+  ──────────────────────────────────────────────────────────────────────────────
+  NL: Dit werk is auteursrechtelijk beschermd. Het mag vrij worden gebruikt,
+  gedeeld en verspreid, uitsluitend voor niet-commerciële doeleinden en
+  uitsluitend in ongewijzigde vorm, met vermelding van de oorspronkelijke
+  auteur. Commercieel gebruik, wijziging, verkoop of integratie in betaalde
+  producten of diensten is uitdrukkelijk verboden zonder schriftelijke
+  toestemming van de auteur. Hulp is en blijft gratis.
+
+  EN: This work is protected by copyright. It may be freely used, shared and
+  distributed for non-commercial purposes only, in unmodified form, with
+  attribution to the original author. Commercial use, modification, sale or
+  integration into paid products or services is strictly prohibited without
+  prior written consent of the author. Help is and remains free.
+
+  IT: Quest'opera è protetta da diritto d'autore. Può essere liberamente
+  utilizzata, condivisa e distribuita esclusivamente per scopi non commerciali,
+  nella sua forma originale e non modificata, con attribuzione all'autore
+  originale. L'uso commerciale è vietato senza consenso scritto dell'autore.
+
+  Originele broncode / Original source / Fonte originale:
+  https://github.com/Jan-den-Hollander
+
+  Alle rechten voorbehouden / All rights reserved / Tutti i diritti riservati
+  © Jan den Hollander
+================================================================================
+  ⚠️ INTEGRITEITSWAARSCHUWING: dit bestand bevat een integriteitscontrole op
+  projectnaam, footer en modal. Verwijdering of wijziging blokkeert de app.
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VisLog">
+<meta name="theme-color" content="#134a63">
+<link rel="manifest" id="pwaManifestLink">
+<link rel="icon" id="pwaFavicon">
+<link rel="apple-touch-icon" id="pwaAppleIcon">
+<title>VisLog</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap');
+:root{--blauw:#134a63;--lichtblauw:#2e86ab;--zand:#c9a876;--wit:#eef5f7;--donker:#0b1c22;--onzeker:#e8a020;--zeker:#3a7d34;--onbekend:#8b4444;--lijn:rgba(46,134,171,0.25);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'IBM Plex Mono',monospace;background:var(--donker);color:var(--wit);min-height:100vh;overflow-x:hidden;padding-bottom:28px;}
+.header{background:var(--blauw);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--lichtblauw);position:sticky;top:0;z-index:100;gap:8px;}
+.header-title{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;flex-shrink:0;}
+.header-title span{font-style:italic;font-weight:300;color:#8fd0e8;}
+.header-right{display:flex;align-items:center;gap:6px;}
+.sessie-badge{font-size:.58rem;background:var(--donker);color:#8fd0e8;padding:4px 7px;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lang-btn{background:var(--donker);border:1px solid var(--lichtblauw);color:#8fd0e8;font-size:.62rem;padding:5px 9px;border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;flex-shrink:0;}
+.tabs{display:flex;background:#081419;border-bottom:1px solid var(--lijn);overflow-x:auto;}
+.tab{flex:1;min-width:50px;padding:8px 1px;text-align:center;font-size:.4rem;letter-spacing:.02em;text-transform:uppercase;color:#5a90a5;cursor:pointer;border:none;background:none;line-height:1.3;}
+.tab.active{color:var(--wit);background:var(--blauw);border-bottom:2px solid #8fd0e8;}
+.screen{display:none;padding:16px;}
+.screen.active{display:block;}
+.card{background:#12303e;border:1px solid var(--lijn);border-radius:4px;padding:16px;margin-bottom:12px;}
+.label{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#8fd0e8;margin-bottom:6px;}
+.inp,select.inp,textarea.inp{width:100%;background:#0b1c22;border:1px solid var(--lijn);color:var(--wit);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:.85rem;border-radius:2px;margin-bottom:10px;}
+.inp:focus{outline:none;border-color:var(--lichtblauw);}
+.gps-row{display:flex;gap:8px;align-items:center;}
+.gps-display{flex:1;background:#0b1c22;border:1px solid var(--lijn);padding:8px 12px;font-size:.7rem;color:#5a90a5;border-radius:2px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:.75rem;letter-spacing:.06em;border:none;border-radius:2px;cursor:pointer;text-transform:uppercase;}
+.btn-primair{background:var(--blauw);color:var(--wit);width:100%;padding:14px;font-size:.8rem;}
+.btn-primair:active{background:var(--lichtblauw);transform:scale(.98);}
+.btn-camera{background:var(--blauw);color:var(--wit);border-radius:50%;width:72px;height:72px;font-size:1.8rem;flex-shrink:0;box-shadow:0 0 0 4px #12303e,0 0 0 6px var(--blauw);}
+.btn-camera:active{transform:scale(.93);}
+.btn-klein{background:#12303e;color:#8fd0e8;border:1px solid var(--lijn);font-size:.65rem;padding:7px 14px;}
+.btn-gps{background:var(--zand);color:#2a2213;font-size:.65rem;padding:8px 12px;flex-shrink:0;}
+.btn-gevaar{background:#4a1a1a;color:#e87070;border:1px solid #6a2a2a;}
+.btn-deel{background:#1a3a50;color:#70c8e8;border:1px solid #2a5a70;font-size:.7rem;padding:9px 14px;flex:1;}
+.btn-prompt{background:#2a1f00;color:#e8c070;border:1px solid #5a3f00;font-size:.7rem;padding:9px 14px;flex:1;}
+.btn-opslaan{background:var(--blauw);color:var(--wit);font-size:.7rem;padding:9px 14px;width:100%;margin-top:6px;}
+.btn-reset{background:#12303e;color:#8fd0e8;border:1px solid var(--lijn);font-size:.6rem;padding:5px 10px;border-radius:2px;cursor:pointer;}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.chip{background:#0b1c22;border:1px solid var(--lijn);color:#8fd0e8;padding:7px 11px;border-radius:3px;font-size:.65rem;cursor:pointer;white-space:nowrap;}
+.chip.actief{background:var(--blauw);border-color:var(--lichtblauw);color:var(--wit);}
+.camera-container{position:relative;background:#000;border-radius:4px;overflow:hidden;margin-bottom:12px;aspect-ratio:4/3;}
+#videoFeed{width:100%;height:100%;object-fit:cover;}
+#fotoPreview{width:100%;height:100%;object-fit:cover;display:none;}
+.camera-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;}
+canvas{display:none;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:#0f2833;border:1px solid var(--lichtblauw);border-radius:8px 8px 0 0;width:100%;max-width:520px;padding:20px 18px 0;transform:translateY(20px);transition:transform .25s;max-height:85vh;display:flex;flex-direction:column;}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+.modal-inhoud{overflow-y:auto;padding-bottom:16px;flex:1;}
+.modal-titel{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:#8fd0e8;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.modal-sluit{background:none;border:none;color:#5a90a5;font-size:1.3rem;cursor:pointer;}
+.modal-footer{border-top:1px solid var(--lijn);padding:12px 0 28px;}
+.btn-terug{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--blauw);color:var(--wit);border:none;border-radius:4px;padding:14px;font-size:.8rem;letter-spacing:.06em;cursor:pointer;}
+.vangst-item{background:#12303e;border:1px solid var(--lijn);border-radius:4px;padding:10px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;}
+.vangst-thumb{width:56px;height:56px;object-fit:cover;border-radius:2px;flex-shrink:0;border:1px solid var(--lijn);}
+.vangst-thumb-ph{width:56px;height:56px;background:#0b1c22;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.vangst-info{flex:1;min-width:0;}
+.vangst-soort{font-family:'Fraunces',serif;font-style:italic;font-size:.95rem;}
+.vangst-meta{font-size:.62rem;color:#5a90a5;margin-top:2px;line-height:1.5;}
+.badge{font-size:.55rem;padding:3px 7px;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;display:inline-block;margin-top:3px;margin-right:4px;}
+.badge-zoet{background:#1a3a1a;color:#7dcf75;}
+.badge-brak{background:#3a3a1a;color:#cfcf75;}
+.badge-zee{background:#1a2a4a;color:#75a8cf;}
+.badge-onbekend{background:#4a1a1a;color:#e87070;}
+.badge-score{background:#3a2a0a;color:#e8c070;}
+.totaal-bar{background:#0b1c22;border:1px solid var(--lijn);border-radius:4px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.totaal-getal{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;color:var(--wit);line-height:1;}
+.totaal-lbl{font-size:.55rem;text-transform:uppercase;color:#5a90a5;}
+#kaartContainer,#vangstKaartContainer{height:240px;border-radius:4px;overflow:hidden;margin-bottom:12px;border:1px solid var(--lijn);}
+.kaart-geen{background:#12303e;height:100%;display:flex;align-items:center;justify-content:center;color:#5a90a5;font-size:.75rem;text-align:center;border-radius:4px;}
+.leaflet-popup-content-wrapper{background:#12303e !important;color:var(--wit) !important;border:1px solid var(--lijn);border-radius:4px !important;font-family:'IBM Plex Mono',monospace;font-size:.7rem;}
+.leaflet-popup-tip{background:#12303e !important;}
+.notif{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--blauw);color:var(--wit);padding:10px 20px;border-radius:4px;font-size:.75rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.notif.zichtbaar{opacity:1;}
+.divider{border:none;border-top:1px solid var(--lijn);margin:14px 0;}
+.sectie-titel{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#5a90a5;margin-bottom:10px;}
+.hof-item{display:flex;align-items:center;gap:10px;background:#12303e;border:1px solid var(--lijn);border-radius:4px;padding:10px;margin-bottom:8px;}
+.hof-rank{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;color:var(--zand);min-width:28px;text-align:center;}
+.hof-rank.top1{color:#ffd75e;}
+.hof-rank.top2{color:#d9d9d9;}
+.hof-rank.top3{color:#cd7f32;}
+.vergunning-kaart{background:#12303e;border-left:3px solid var(--lichtblauw);border-radius:0 4px 4px 0;padding:12px 14px;margin-bottom:10px;}
+.vergunning-titel{font-family:'Fraunces',serif;font-size:1rem;color:#8fd0e8;margin-bottom:6px;}
+.vergunning-tekst{font-size:.72rem;line-height:1.7;color:var(--wit);}
+.vergunning-tekst a{color:#70c8e8;}
+.export-card{background:#12303e;border:1px solid var(--lijn);border-radius:4px;padding:16px;margin-bottom:12px;text-align:center;}
+.export-desc{font-size:.7rem;color:#5a90a5;line-height:1.6;margin-bottom:12px;}
+.spot-kies{display:flex;gap:8px;margin-bottom:10px;}
+.spot-btn{flex:1;padding:10px;border-radius:3px;border:1px solid var(--lijn);background:#0b1c22;color:#8fd0e8;font-size:.65rem;text-transform:uppercase;cursor:pointer;}
+.spot-btn.actief-nieuw{background:#1a3a4a;border-color:#2e86ab;}
+.spot-btn.actief-goed{background:#1a4a2a;border-color:#3a7d34;}
+.weer-link{display:flex;align-items:center;gap:8px;background:#0b1c22;border:1px solid var(--lijn);border-radius:3px;padding:10px 12px;margin-bottom:6px;color:#8fd0e8;text-decoration:none;font-size:.72rem;}
+.weer-link:active{background:#12303e;}
+.weer-groep{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:#5a90a5;margin:10px 0 6px;}
+</style>
+</head>
+<body>
+<script>
+(function() {
+  try {
+    var svgIcoon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#134a63"/><text x="256" y="340" font-family="Georgia, serif" font-size="260" font-weight="700" fill="#eef5f7" text-anchor="middle">V</text></svg>';
+    var iconDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgIcoon)));
+    var faviconEl = document.getElementById('pwaFavicon'); if (faviconEl) faviconEl.href = iconDataUrl;
+    var appleIconEl = document.getElementById('pwaAppleIcon'); if (appleIconEl) appleIconEl.href = iconDataUrl;
+    var manifest = {name:'VisLog',short_name:'VisLog',description:'Vergunningen, vangsten en visstekken bijhouden.',start_url:'.',scope:'.',display:'standalone',orientation:'portrait',background_color:'#0b1c22',theme_color:'#134a63',
+      icons:[{src:iconDataUrl,sizes:'192x192',type:'image/svg+xml',purpose:'any'},{src:iconDataUrl,sizes:'512x512',type:'image/svg+xml',purpose:'any'},{src:iconDataUrl,sizes:'512x512',type:'image/svg+xml',purpose:'maskable'}]};
+    var manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+    var manifestEl = document.getElementById('pwaManifestLink'); if (manifestEl) manifestEl.href = URL.createObjectURL(manifestBlob);
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      var swCode = "const CACHE='vislog-cache-v2';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{self.clients.claim();});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.open(CACHE).then(cache=>cache.match(e.request).then(cached=>{const netFetch=fetch(e.request).then(resp=>{if(resp&&resp.ok)cache.put(e.request,resp.clone());return resp;}).catch(()=>cached);return cached||netFetch;})));});";
+      var swUrl = URL.createObjectURL(new Blob([swCode], { type: 'application/javascript' }));
+      navigator.serviceWorker.register(swUrl).catch(function(e){console.error('SW fout:',e);});
+    }
+  } catch (e) { console.error('PWA-setup fout:', e); }
+})();
+</script>
+
+<!-- DETERMINATIETIPS MODAL -->
+<div class="modal-overlay" id="tipsModal" onclick="sluitModal(event)">
+  <div class="modal-box">
+    <div class="modal-titel"><span data-i18n="modal.titel">&#128247; Tips voor determinatie</span><button class="modal-sluit" onclick="sluitModalDirect()">&#10005;</button></div>
+    <div class="modal-inhoud">
+      <div class="vergunning-kaart"><div class="vergunning-titel" data-i18n="modal.kenmerkenTitel">&#128269; Herkenbare kenmerken</div><div class="vergunning-tekst" data-i18n="modal.kenmerkenTekst">Fotografeer de vis van opzij, volledig in beeld. Let op vinvorm, kleurpatroon, bek/snuit en schubben.</div></div>
+      <div class="vergunning-kaart"><div class="vergunning-titel" data-i18n="modal.maatTitel">&#128207; Maatreferentie</div><div class="vergunning-tekst" data-i18n="modal.maatTekst">Voor een exacte lengte gebruik je een rolmaat. Heb je die niet bij de hand? Leg dan een herkenbaar object (sleutels, bankpas, hand) in beeld als schaalreferentie.</div></div>
+      <div class="vergunning-kaart"><div class="vergunning-titel" data-i18n="modal.twijfelTitel">&#127754; Twijfelgeval?</div><div class="vergunning-tekst" data-i18n="modal.twijfelTekst">Kies bij de soortkeuze "Onbekend / nieuw voor mij" — dan krijg je de AI-determinatie flow: foto delen, prompt kopiëren, antwoord terugplakken.</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn-terug" onclick="sluitModalDirect()" data-i18n="modal.terugBtn">&#128247; Terug naar foto maken</button></div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-title">Vis<span>Log</span></div>
+  <div class="header-right">
+    <div class="sessie-badge" id="sessieLabel" data-i18n="header.geenSessie">Geen sessie</div>
+    <button class="lang-btn" onclick="wisselTaal()" id="langBtn">IT</button>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="toonScherm('start')">&#9881;<br><span data-i18n="tabs.start">Start</span></button>
+  <button class="tab" onclick="toonScherm('vangst')">&#128247;<br><span data-i18n="tabs.vangst">Vangst</span></button>
+  <button class="tab" onclick="toonScherm('log')">&#128203;<br><span data-i18n="tabs.log">Log</span></button>
+  <button class="tab" onclick="toonScherm('kaart')">&#128506;<br><span data-i18n="tabs.kaart">Kaart</span></button>
+  <button class="tab" onclick="toonScherm('hof')">&#127942;<br><span data-i18n="tabs.hof">Top</span></button>
+  <button class="tab" onclick="toonScherm('export')">&#8599;<br><span data-i18n="tabs.export">Export</span></button>
+</div>
+
+<!-- START -->
+<div id="scherm-start" class="screen active">
+  <div class="card">
+    <div class="label" data-i18n="start.visser">&#128100; Visser</div>
+    <input type="text" class="inp" id="visserNaam" data-i18n-ph="start.visserPh" placeholder="Jouw naam">
+    <div class="label" data-i18n="start.sessie">Sessie / Locatie</div>
+    <input type="text" class="inp" id="sessieLocatie" data-i18n-ph="start.sessiePh" placeholder="bijv. Grevelingenmeer noordoever">
+    <div class="label" data-i18n="start.datum">Datum</div>
+    <input type="date" class="inp" id="datumInput">
+    <div class="label" data-i18n="start.gps">GPS-startpunt</div>
+    <div class="gps-row">
+      <div class="gps-display" id="gpsDisplay" data-i18n="start.gpsNietbepaald">Nog niet bepaald</div>
+      <button class="btn btn-gps" id="gpsKnop" onclick="bepaalGPS('start')">&#128205; GPS</button>
+    </div>
+    <div id="startKaartContainer" style="height:160px;border-radius:4px;overflow:hidden;margin-top:10px;border:1px solid var(--lijn);display:none"></div>
+  </div>
+  <button class="btn btn-primair" onclick="startSessie()" data-i18n="start.startBtn">&#9654; Start nieuwe sessie</button>
+  <hr class="divider">
+  <div class="sectie-titel" data-i18n="start.werkwijzeTitel">Werkwijze</div>
+  <div class="card" style="background:#0b1c22;border-color:var(--lijn)">
+    <div data-i18n="start.werkwijzeTekst">
+      <strong>1. Start</strong> &#8594; naam, locatie, GPS, sessie starten<br>
+      <strong>2. Vangst</strong> &#8594; foto + soort + meetgegevens per vis<br>
+      <strong>3. Log</strong> &#8594; overzicht van deze sessie op kaart<br>
+      <strong>4. Kaart</strong> &#8594; vergunning-info per land + eigen stekken<br>
+      <strong>5. Top</strong> &#8594; Hall of Fame, beste vangsten ooit<br>
+      <strong>6. Export</strong> &#8594; CSV van al je vangsten
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="sectie-titel" data-i18n="weer.titel">&#127768;&#65039; Weer &amp; water (gratis bronnen)</div>
+  <div class="card" style="background:#0b1c22;border-color:var(--lijn)">
+    <div class="weer-groep" data-i18n="weer.nl">Nederland</div>
+    <a class="weer-link" href="https://www.buienradar.nl" target="_blank" rel="noopener">&#127782;&#65039; Buienradar — <span data-i18n="weer.buienradar">neerslag &amp; wind</span></a>
+    <a class="weer-link" href="https://www.knmi.nl/nederland-nu/weer/verwachtingen" target="_blank" rel="noopener">&#128202; KNMI — <span data-i18n="weer.knmi">weerbericht</span></a>
+    <a class="weer-link" href="https://waterinfo.rws.nl" target="_blank" rel="noopener">&#127754; Waterinfo RWS — <span data-i18n="weer.waterinfoNl">waterstand &amp; getij</span></a>
+    <div class="weer-groep" data-i18n="weer.be">België</div>
+    <a class="weer-link" href="https://www.meteo.be" target="_blank" rel="noopener">&#127782;&#65039; RMI/KMI — <span data-i18n="weer.meteobe">weerbericht</span></a>
+    <a class="weer-link" href="https://waterinfo.be" target="_blank" rel="noopener">&#127754; Waterinfo Vlaanderen — <span data-i18n="weer.waterinfoBe">waterstand</span></a> 
+
+    <div class="weer-groep" data-i18n="weer.lux">Luxemburg</div>
+    <a class="weer-link" href="https://www.meteolux.lu" target="_blank" rel="noopener">&#127782;&#65039; MeteoLux — <span data-i18n="weer.meteolux">weerbericht</span></a>
+
+    <div class="weer-groep" data-i18n="weer.algemeen">Wind &amp; luchtdruk;schaduwkantkaart (Benelux breed)</div>
+
+    <a class="weer-link" href="https://www.windy.com" target="_blank" rel="noopener">&#128168; Windy — <span data-i18n="weer.windy">wind, druk, golfhoogte</span></a>
+
+
+
+    <a class="weer-link" href="https://www.windfinder.com" target="_blank" rel="noopener">&#128168; Windfinder — <span data-i18n="weer.windfinder">wind per locatie</span></a>
+
+  </div>
+</div>
+
+<!-- VANGST -->
+<div id="scherm-vangst" class="screen">
+  <button class="btn btn-klein" style="width:100%;margin-bottom:10px;background:#12303e" onclick="openModal()"><span data-i18n="vangst.tipsBtn">&#128247; Determinatietips &#8250;</span></button>
+  <div class="label" data-i18n="vangst.soortLabel">&#128031; Vissoort</div>
+  <select class="inp" id="soortSelect" onchange="soortGewijzigd()"></select>
+  <div id="onbekendBlok" style="display:none">
+    <div class="card" style="border-color:#5a3f00;background:#2a1f00">
+      <div style="font-size:.7rem;color:#e8c070;margin-bottom:8px" data-i18n="vangst.onbekendHint">Onbekende soort &#8594; deel de foto met een AI-app en plak het antwoord terug.</div>
+      <div class="chip-row"><button class="btn btn-deel" onclick="deelDeterminatieFoto()" data-i18n="vangst.deelBtn">&#8679; Deel foto</button><button class="btn btn-prompt" onclick="kopieerDeterminatiePrompt()" data-i18n="vangst.kopieerBtn">&#128203; Kopieer prompt</button></div>
+      <textarea class="inp" id="determinatieAntwoord" data-i18n-ph="vangst.plakPh" placeholder="Plak hier het antwoord van de AI..." style="min-height:70px"></textarea>
+      <div style="font-size:.62rem;color:#8fd0e8;margin-bottom:6px" data-i18n="vangst.naamLabel">Vermoedelijke soortnaam:</div>
+      <input type="text" class="inp" id="onbekendSoortNaam" data-i18n-ph="vangst.naamPh" placeholder="bijv. Roofblei">
+    </div>
+  </div>
+  <div class="label" data-i18n="vangst.schaalLabel">&#128207; Maatreferentie in beeld (optioneel)</div>
+  <div style="font-size:.62rem;color:#5a90a5;margin-bottom:6px" data-i18n="vangst.schaalHint">Voor exacte lengte: gebruik een rolmaat en vul die hieronder in. Geen rolmaat bij de hand? Leg dan dit in beeld:</div>
+  <div class="chip-row" id="schaalChips">
+    <button class="chip" data-w="rolmaat" onclick="kiesSchaalChip(this,'rolmaat 30 cm')">&#128208; <span data-i18n="schaal.rolmaat">Rolmaat</span></button>
+    <button class="chip" data-w="lineaal" onclick="kiesSchaalChip(this,'lineaal 30 cm')">&#128207; <span data-i18n="schaal.lineaal">Lineaal</span></button>
+    <button class="chip" data-w="sleutels" onclick="kiesSchaalChip(this,'sleutelbos ca. 11 cm')">&#128273; <span data-i18n="schaal.sleutels">Sleutels</span></button>
+    <button class="chip" data-w="bankpas" onclick="kiesSchaalChip(this,'bankpas 8.5 cm')">&#128179; <span data-i18n="schaal.bankpas">Bankpas</span></button>
+    <button class="chip" data-w="hand" onclick="kiesSchaalChip(this,'hand duim-pink ca. 20 cm')">&#9995; <span data-i18n="schaal.hand">Hand</span></button>
+    <button class="chip" data-w="geen" onclick="kiesSchaalChip(this,'geen referentie')">&#10005; <span data-i18n="schaal.geen">Geen</span></button>
+  </div>
+  <input type="text" class="inp" id="schaalReferentie" data-i18n-ph="schaal.customPh" placeholder="of typ zelf, bijv. schoenmaat 43">
+  <div class="camera-container">
+    <video id="videoFeed" autoplay playsinline muted></video>
+    <img id="fotoPreview" alt="Foto">
+  </div>
+  <div class="camera-controls">
+    <button class="btn btn-klein" onclick="nieuweCamera()"><span data-i18n="vangst.opnieuw">&#8617; Opnieuw</span></button>
+    <button class="btn btn-camera" onclick="maakFoto()">&#128247;</button>
+  </div>
+  <canvas id="fotoCanvas"></canvas>
+  <hr class="divider">
+  <div class="label" data-i18n="vangst.watertypeLabel">Watertype</div>
+  <div class="chip-row" id="watertypeChips">
+    <button class="chip" data-w="zoet" onclick="kiesChip(this,'watertype')"><span data-i18n="chip.zoet">Zoetwater</span></button>
+    <button class="chip" data-w="brak" onclick="kiesChip(this,'watertype')"><span data-i18n="chip.brak">Brakwater</span></button>
+    <button class="chip" data-w="zee" onclick="kiesChip(this,'watertype')"><span data-i18n="chip.zeewater">Zeewater</span></button>
+  </div>
+  <div class="label" data-i18n="vangst.maatLabel">Lengte (cm) &amp; gewicht (gram, optioneel)</div>
+  <div style="display:flex;gap:8px">
+    <input type="number" class="inp" id="lengteInp" data-i18n-ph="vangst.lengtePh" placeholder="Lengte cm">
+    <input type="number" class="inp" id="gewichtInp" data-i18n-ph="vangst.gewichtPh" placeholder="Gewicht g">
+  </div>
+  <div class="label" data-i18n="vangst.stromingLabel">Stroming</div>
+  <div class="chip-row"><button class="chip" data-w="stil" onclick="kiesChip(this,'stroming')"><span data-i18n="chip.stil">Stilstaand</span></button><button class="chip" data-w="stromend" onclick="kiesChip(this,'stroming')"><span data-i18n="chip.stromend">Stromend</span></button></div>
+  <div class="label" data-i18n="vangst.helderheidLabel">Helderheid</div>
+  <div class="chip-row"><button class="chip" data-w="helder" onclick="kiesChip(this,'helderheid')"><span data-i18n="chip.helder">Helder</span></button><button class="chip" data-w="troebel" onclick="kiesChip(this,'helderheid')"><span data-i18n="chip.troebel">Troebel</span></button></div>
+  <div class="label" data-i18n="vangst.waterLabel">Water</div>
+  <div class="chip-row">
+    <button class="chip" data-w="klein" onclick="kiesChip(this,'watergrootte')"><span data-i18n="chip.klein">Kleine rivier/sloot</span></button>
+    <button class="chip" data-w="groot" onclick="kiesChip(this,'watergrootte')"><span data-i18n="chip.groot">Grote rivier</span></button>
+    <button class="chip" data-w="meer" onclick="kiesChip(this,'watergrootte')"><span data-i18n="chip.meer">Meer/plas</span></button>
+    <button class="chip" data-w="zee" onclick="kiesChip(this,'watergrootte')"><span data-i18n="chip.zeewater">Zeewater</span></button>
+  </div>
+  <div class="label" data-i18n="vangst.vanafLabel">Gevist vanaf</div>
+  <div class="chip-row"><button class="chip" data-w="oever" onclick="kiesChip(this,'vanaf')"><span data-i18n="chip.oever">Oever</span></button><button class="chip" data-w="brug" onclick="kiesChip(this,'vanaf')"><span data-i18n="chip.brug">Brug</span></button><button class="chip" data-w="boot" onclick="kiesChip(this,'vanaf')"><span data-i18n="chip.boot">Boot</span></button></div>
+  <div id="bootDetailBlok" style="display:none">
+    <input type="text" class="inp" id="bootDetailInp" data-i18n-ph="vangst.bootPh" placeholder="bijv. rederij naam, of eigen roei-/motorboot">
+  </div>
+  <div class="label" data-i18n="vangst.moeilijkheidLabel">Moeilijkheidsgraad vangst</div>
+  <div class="chip-row"><button class="chip" data-w="makkelijk" onclick="kiesChip(this,'moeilijkheid')"><span data-i18n="chip.makkelijk">Makkelijk</span></button><button class="chip" data-w="gemiddeld" onclick="kiesChip(this,'moeilijkheid')"><span data-i18n="chip.gemiddeld">Gemiddeld</span></button><button class="chip" data-w="moeilijk" onclick="kiesChip(this,'moeilijkheid')"><span data-i18n="chip.moeilijk">Moeilijk</span></button></div>
+  <div class="label" data-i18n="vangst.tegenstandLabel">Tegenstand van de vis</div>
+  <div class="chip-row"><button class="chip" data-w="weinig" onclick="kiesChip(this,'tegenstand')"><span data-i18n="chip.weinig">Weinig</span></button><button class="chip" data-w="gemiddeld" onclick="kiesChip(this,'tegenstand')"><span data-i18n="chip.gemiddeld">Gemiddeld</span></button><button class="chip" data-w="veel" onclick="kiesChip(this,'tegenstand')"><span data-i18n="chip.veel">Veel</span></button></div>
+  <div class="label" data-i18n="vangst.hengelLabel">Hengel</div>
+  <input type="text" class="inp" id="hengelInp" data-i18n-ph="vangst.hengelPh" placeholder="bijv. karperhengel 3.6m / spinhengel">
+  <div class="label" data-i18n="vangst.aasLabel">Aas / lokmiddel</div>
+  <input type="text" class="inp" id="aasInp" data-i18n-ph="vangst.aasPh" placeholder="bijv. worm, kunstaas, boilie, pluggen">
+  <div class="label" data-i18n="vangst.gpsLabel">Vangstlocatie</div>
+  <div class="gps-row" style="margin-bottom:10px">
+    <div class="gps-display" id="vangstGpsDisplay" data-i18n="start.gpsNietbepaald">Nog niet bepaald</div>
+    <button class="btn btn-gps" onclick="bepaalGPS('vangst')">&#128205; GPS</button>
+  </div>
+  <button class="btn btn-opslaan" onclick="slaVangstOp()" data-i18n="vangst.opslaanBtn">&#10003; Vangst opslaan</button>
+</div>
+
+<!-- LOG -->
+<div id="scherm-log" class="screen">
+  <div class="totaal-bar">
+    <div><div class="totaal-getal" id="totaalVangsten">0</div><div class="totaal-lbl" data-i18n="log.vangsten">vangsten</div></div>
+    <div style="text-align:center"><div class="totaal-getal" id="totaalSoorten">0</div><div class="totaal-lbl" data-i18n="log.soorten">soorten</div></div>
+    <div style="text-align:right"><div class="totaal-getal" id="beteZwaarste">0</div><div class="totaal-lbl" data-i18n="log.zwaarste">g zwaarste</div></div>
+  </div>
+  <div class="sectie-titel" data-i18n="log.kaartTitel">Vangstlocaties</div>
+  <div id="vangstKaartContainer"><div class="kaart-geen" data-i18n="log.kaartGeen">&#128506;<br>Nog geen GPS-punten</div></div>
+  <div id="logLijst"><div style="font-size:.75rem;color:#5a90a5;text-align:center;padding:20px" data-i18n="log.geen">Nog geen vangsten deze sessie</div></div>
+</div>
+
+<!-- KAART -->
+<div id="scherm-kaart" class="screen">
+  <div class="sectie-titel" data-i18n="kaart.vergunningTitel">Vergunningen Benelux</div>
+  <div class="vergunning-kaart"><div class="vergunning-titel">&#127475;&#127473; <span data-i18n="kaart.nlTitel">Nederland</span></div><div class="vergunning-tekst" data-i18n="kaart.nlTekst">VISpas (landelijk, via hengelsportfederaties/sportvisserijnederland.nl) of Kleine VISpas voor één specifiek water. Check altijd de Lijst van Nederlandse Wateren — sommige wateren hebben aanvullende regels of nachtvisverbod.</div></div>
+  <div class="vergunning-kaart"><div class="vergunning-titel">&#127463;&#127466; <span data-i18n="kaart.vlTitel">Vlaanderen</span></div><div class="vergunning-tekst" data-i18n="kaart.vlTekst">Visverlof (visserijheffing) via de Vlaamse overheid, plus toestemming van de watereigenaar/hengelfederatie (bv. VVF Vlaanderen) voor het specifieke water.</div></div>
+  <div class="vergunning-kaart"><div class="vergunning-titel">&#127463;&#127466; <span data-i18n="kaart.waTitel">Wallonië</span></div><div class="vergunning-tekst" data-i18n="kaart.waTekst">Permis de pêche via de Service Public de Wallonie, plus eventueel lidmaatschap van de lokale hengelvereniging.</div></div>
+  <div class="vergunning-kaart"><div class="vergunning-titel">&#127473;&#127482; <span data-i18n="kaart.luxTitel">Luxemburg</span></div><div class="vergunning-tekst" data-i18n="kaart.luxTekst">Permis de pêche via de Administration de la nature et des forêts, samen met de "carte de pêche" van de betrokken vereniging.</div></div>
+  <div style="font-size:.62rem;color:#5a90a5;margin-bottom:12px" data-i18n="kaart.disclaimer">&#9888; Regels wijzigen jaarlijks &mdash; controleer altijd de actuele voorwaarden.</div>
+  <hr class="divider">
+  <div class="sectie-titel" data-i18n="kaart.stekkenTitel">Eigen stekken</div>
+  <div class="spot-kies">
+    <button class="spot-btn" id="spotNieuwBtn" onclick="kiesSpotType('nieuw')">&#128204; <span data-i18n="kaart.spotNieuw">Nieuwe plek</span></button>
+    <button class="spot-btn" id="spotGoedBtn" onclick="kiesSpotType('goed')">&#11088; <span data-i18n="kaart.spotGoed">Goede plek</span></button>
+  </div>
+  <input type="text" class="inp" id="spotNotitie" data-i18n-ph="kaart.notitiePh" placeholder="notitie, bijv. veel snoekbaars gezien">
+  <button class="btn btn-primair" style="margin-bottom:12px" onclick="markeerSpot()"><span data-i18n="kaart.markeerBtn">&#128205; Markeer huidige locatie</span></button>
+  <div id="kaartContainer"><div class="kaart-geen" data-i18n="kaart.geenStekken">&#128506;<br>Nog geen gemarkeerde stekken</div></div>
+  <div id="spotLijst"></div>
+</div>
+
+<!-- HALL OF FAME -->
+<div id="scherm-hof" class="screen">
+  <div class="sectie-titel" data-i18n="hof.titel">&#127942; Hall of Fame &mdash; beste vangsten</div>
+  <div id="hofLijst"><div style="font-size:.75rem;color:#5a90a5;text-align:center;padding:20px" data-i18n="hof.geen">Nog geen vangsten geregistreerd</div></div>
+</div>
+
+<!-- EXPORT -->
+<div id="scherm-export" class="screen">
+  <div class="export-card">
+    <div style="font-size:2rem;margin-bottom:8px">&#128196;</div>
+    <div class="sectie-titel" data-i18n="export.csvTitel">CSV &mdash; alle vangsten</div>
+    <div class="export-desc" data-i18n="export.csvDesc">Per vangst: datum, soort, watertype, lengte, gewicht, locatie, omstandigheden, hengel, aas, moeilijkheidsgraad, score.</div>
+    <button class="btn btn-primair" onclick="exporteerCSV()"><span data-i18n="export.csvBtn">&#8595; Download CSV</span></button>
+  </div>
+  <div class="export-card">
+    <div style="font-size:2rem;margin-bottom:8px">&#128506;</div>
+    <div class="sectie-titel" data-i18n="export.spotsTitel">CSV &mdash; stekken</div>
+    <div class="export-desc" data-i18n="export.spotsDesc">Al je gemarkeerde nieuwe en goede plekken met GPS en notities.</div>
+    <button class="btn btn-primair" onclick="exporteerSpots()"><span data-i18n="export.spotsBtn">&#8595; Download stekken</span></button>
+  </div>
+  <hr class="divider">
+  <div class="card"><div class="label" data-i18n="export.sessieLabel">Huidige sessie</div><div id="sessieArchief" style="font-size:.72rem;color:#5a90a5">Laden...</div></div>
+  <button class="btn btn-klein btn-gevaar" onclick="verwijderSessie()" style="width:100%;margin-top:8px"><span data-i18n="export.wisSessie">&#10005; Huidige sessie wissen</span></button>
+  <button class="btn btn-klein btn-gevaar" onclick="verwijderAlles()" style="width:100%;margin-top:8px"><span data-i18n="export.wisAlles">&#10005; Alle data wissen (incl. archief &amp; stekken)</span></button>
+</div>
+
+<canvas id="kaartCanvas" style="display:none"></canvas>
+<div class="notif" id="notif"></div>
+
+<script>
+var SOORTEN = [
+  {naam:'Snoek',type:'zoet',factor:3},{naam:'Snoekbaars',type:'zoet',factor:3},{naam:'Baars',type:'zoet',factor:1},
+  {naam:'Blankvoorn',type:'zoet',factor:1},{naam:'Brasem',type:'zoet',factor:1},{naam:'Karper',type:'zoet',factor:2},
+  {naam:'Zeelt',type:'zoet',factor:2},{naam:'Winde',type:'zoet',factor:2},{naam:'Kolblei',type:'zoet',factor:1},
+  {naam:'Rietvoorn',type:'zoet',factor:1},{naam:'Aal/Paling',type:'zoet',factor:2},{naam:'Meerval',type:'zoet',factor:3},
+  {naam:'Roofblei',type:'zoet',factor:2},{naam:'Kopvoorn',type:'zoet',factor:2},{naam:'Barbeel',type:'zoet',factor:3},
+  {naam:'Beekforel',type:'zoet',factor:3},{naam:'Regenboogforel',type:'zoet',factor:2},{naam:'Vlagzalm',type:'zoet',factor:3},
+  {naam:'Zeebaars',type:'brak',factor:3},{naam:'Bot',type:'brak',factor:1},{naam:'Harder',type:'brak',factor:2},{naam:'Diklipharder',type:'brak',factor:2},
+  {naam:'Kabeljauw',type:'zee',factor:3},{naam:'Wijting',type:'zee',factor:1},{naam:'Schol',type:'zee',factor:1},
+  {naam:'Makreel',type:'zee',factor:1},{naam:'Horsmakreel',type:'zee',factor:1},{naam:'Zeebrasem',type:'zee',factor:2},
+  {naam:'Zeeforel',type:'zee',factor:3},{naam:'Ansjovis',type:'zee',factor:1}
+];
+
+var TR = {
+  nl: {
+    header:{geenSessie:'Geen sessie'},
+    tabs:{start:'Start',vangst:'Vangst',log:'Log',kaart:'Kaart',hof:'Top',export:'Export'},
+    start:{visser:'&#128100; Visser',visserPh:'Jouw naam',sessie:'Sessie / Locatie',sessiePh:'bijv. Grevelingenmeer noordoever',datum:'Datum',gps:'GPS-startpunt',gpsNietbepaald:'Nog niet bepaald',startBtn:'&#9654; Start nieuwe sessie',werkwijzeTitel:'Werkwijze',
+      werkwijzeTekst:'<strong>1. Start</strong> &#8594; naam, locatie, GPS, sessie starten<br><strong>2. Vangst</strong> &#8594; foto + soort + meetgegevens per vis<br><strong>3. Log</strong> &#8594; overzicht van deze sessie op kaart<br><strong>4. Kaart</strong> &#8594; vergunning-info per land + eigen stekken<br><strong>5. Top</strong> &#8594; Hall of Fame, beste vangsten ooit<br><strong>6. Export</strong> &#8594; CSV van al je vangsten'},
+    weer:{titel:'&#127768;&#65039; Weer &amp; water (gratis bronnen)',nl:'Nederland',be:'België',lux:'Luxemburg',algemeen:'Wind &amp; luchtdruk (Benelux breed)',
+      buienradar:'neerslag &amp; wind',knmi:'weerbericht',waterinfoNl:'waterstand &amp; getij',meteobe:'weerbericht',waterinfoBe:'waterstand',meteolux:'weerbericht',windy:'wind, druk, golfhoogte',windfinder:'wind per locatie'},
+    vangst:{tipsBtn:'&#128247; Determinatietips &#8250;',soortLabel:'&#128031; Vissoort',onbekendHint:'Onbekende soort &#8594; deel de foto met een AI-app en plak het antwoord terug.',deelBtn:'&#8679; Deel foto',kopieerBtn:'&#128203; Kopieer prompt',plakPh:'Plak hier het antwoord van de AI...',naamLabel:'Vermoedelijke soortnaam:',naamPh:'bijv. Roofblei',
+      schaalLabel:'&#128207; Maatreferentie in beeld (optioneel)',schaalHint:'Voor exacte lengte: gebruik een rolmaat en vul die hieronder in. Geen rolmaat bij de hand? Leg dan dit in beeld:',opnieuw:'&#8617; Opnieuw',
+      watertypeLabel:'Watertype',maatLabel:'Lengte (cm) &amp; gewicht (gram, optioneel)',lengtePh:'Lengte cm',gewichtPh:'Gewicht g',
+      stromingLabel:'Stroming',helderheidLabel:'Helderheid',waterLabel:'Water',vanafLabel:'Gevist vanaf',bootPh:'bijv. rederij naam, of eigen roei-/motorboot',
+      moeilijkheidLabel:'Moeilijkheidsgraad vangst',tegenstandLabel:'Tegenstand van de vis',hengelLabel:'Hengel',hengelPh:'bijv. karperhengel 3.6m / spinhengel',
+      aasLabel:'Aas / lokmiddel',aasPh:'bijv. worm, kunstaas, boilie, pluggen',gpsLabel:'Vangstlocatie',opslaanBtn:'&#10003; Vangst opslaan'},
+    schaal:{rolmaat:'Rolmaat',lineaal:'Lineaal',sleutels:'Sleutels',bankpas:'Bankpas',hand:'Hand',geen:'Geen',customPh:'of typ zelf, bijv. schoenmaat 43'},
+    chip:{zoet:'Zoetwater',brak:'Brakwater',zeewater:'Zeewater',stil:'Stilstaand',stromend:'Stromend',helder:'Helder',troebel:'Troebel',klein:'Kleine rivier/sloot',groot:'Grote rivier',meer:'Meer/plas',oever:'Oever',brug:'Brug',boot:'Boot',makkelijk:'Makkelijk',gemiddeld:'Gemiddeld',moeilijk:'Moeilijk',weinig:'Weinig',veel:'Veel'},
+    log:{vangsten:'vangsten',soorten:'soorten',zwaarste:'g zwaarste',kaartTitel:'Vangstlocaties',kaartGeen:'&#128506;<br>Nog geen GPS-punten',geen:'Nog geen vangsten deze sessie'},
+    kaart:{vergunningTitel:'Vergunningen Benelux',nlTitel:'Nederland',nlTekst:'VISpas (landelijk, via hengelsportfederaties/sportvisserijnederland.nl) of Kleine VISpas voor één specifiek water. Check altijd de Lijst van Nederlandse Wateren — sommige wateren hebben aanvullende regels of nachtvisverbod.',
+      vlTitel:'Vlaanderen',vlTekst:'Visverlof (visserijheffing) via de Vlaamse overheid, plus toestemming van de watereigenaar/hengelfederatie (bv. VVF Vlaanderen) voor het specifieke water.',
+      waTitel:'Wallonië',waTekst:'Permis de pêche via de Service Public de Wallonie, plus eventueel lidmaatschap van de lokale hengelvereniging.',
+      luxTitel:'Luxemburg',luxTekst:'Permis de pêche via de Administration de la nature et des forêts, samen met de "carte de pêche" van de betrokken vereniging.',
+      disclaimer:'&#9888; Regels wijzigen jaarlijks &mdash; controleer altijd de actuele voorwaarden.',stekkenTitel:'Eigen stekken',spotNieuw:'Nieuwe plek',spotGoed:'Goede plek',notitiePh:'notitie, bijv. veel snoekbaars gezien',markeerBtn:'&#128205; Markeer huidige locatie',geenStekken:'&#128506;<br>Nog geen gemarkeerde stekken'},
+    hof:{titel:'&#127942; Hall of Fame &mdash; beste vangsten',geen:'Nog geen vangsten geregistreerd'},
+    export:{csvTitel:'CSV &mdash; alle vangsten',csvDesc:'Per vangst: datum, soort, watertype, lengte, gewicht, locatie, omstandigheden, hengel, aas, moeilijkheidsgraad, score.⚠️ Soortnamen in de CSV staan altijd in het Nederlands, ook als je de vangst in het Italiaans hebt ingevoerd — handig voor consistente data, maar vergelijk zelf even met een soortenlijst.',csvBtn:'&#8595; Download CSV',
+      spotsTitel:'CSV &mdash; stekken',spotsDesc:'Al je gemarkeerde nieuwe en goede plekken met GPS en notities.',spotsBtn:'&#8595; Download stekken',
+      sessieLabel:'Huidige sessie',wisSessie:'&#10005; Huidige sessie wissen',wisAlles:'&#10005; Alle data wissen (incl. archief &amp; stekken)'},
+    modal:{titel:'&#128247; Tips voor determinatie',kenmerkenTitel:'&#128269; Herkenbare kenmerken',kenmerkenTekst:'Fotografeer de vis van opzij, volledig in beeld. Let op vinvorm, kleurpatroon, bek/snuit en schubben.',
+      maatTitel:'&#128207; Maatreferentie',maatTekst:'Voor een exacte lengte gebruik je een rolmaat. Geen rolmaat bij de hand? Leg dan een herkenbaar object (sleutels, bankpas, hand) in beeld.',
+      twijfelTitel:'&#127754; Twijfelgeval?',twijfelTekst:'Kies bij de soortkeuze "Onbekend / nieuw voor mij" — dan krijg je de AI-determinatie flow.',terugBtn:'&#128247; Terug naar foto maken'},
+    notif:{vulLocatie:'Vul een locatienaam in',sessieGestart:'Sessie gestart',gpsZoeken:'Zoeken...',gpsBepaald:'GPS bepaald \u2713',gpsMislukt:'GPS mislukt',gpsGeweigerd:'Toestemming geweigerd',gpsGeenSignaal:'Signaal niet gevonden',gpsTimeout:'Time-out',
+      startSessieEerst:'Start eerst een sessie',kiesSoort:'Kies of vul een vissoort in',kiesWatertype:'Kies een watertype',vangstOpgeslagen:'Vangst opgeslagen \u2713 (score ',promptGekopieerd:'Prompt gekopieerd \u2713',kopieerHandmatig:'Kopieer handmatig',makEerstFoto:'Maak eerst een foto',delenMislukt:'Delen mislukt',fotoGedownload:'Foto gedownload \u2014 open in AI-app',
+      stekGemarkeerd:'Stek gemarkeerd \u2713',geenVangsten:'Geen vangsten',geenStekken:'Geen stekken',csvGedownload:'CSV gedownload \u2713',stekkenGedownload:'Stekken gedownload \u2713',sessieGewist:'Sessie gewist',allesGewist:'Alle data gewist',
+      confirmWisSessie:'Huidige sessie en vangsten wissen? Exporteer eerst!',confirmWisAlles:'ALLES wissen, inclusief Hall of Fame archief en stekken? Dit kan niet ongedaan gemaakt worden.',cameraFout:'Camera: '}
+  },
+  it: {
+    header:{geenSessie:'Nessuna sessione'},
+    tabs:{start:'Inizio',vangst:'Cattura',log:'Diario',kaart:'Mappa',hof:'Top',export:'Esporta'},
+    start:{visser:'&#128100; Pescatore',visserPh:'Il tuo nome',sessie:'Sessione / Località',sessiePh:'es. Grevelingenmeer sponda nord',datum:'Data',gps:'Punto GPS iniziale',gpsNietbepaald:'Non ancora determinato',startBtn:'&#9654; Avvia nuova sessione',werkwijzeTitel:'Come funziona',
+      werkwijzeTekst:'<strong>1. Inizio</strong> &#8594; nome, località, GPS, avvia sessione<br><strong>2. Cattura</strong> &#8594; foto + specie + dati per pesce<br><strong>3. Diario</strong> &#8594; panoramica della sessione sulla mappa<br><strong>4. Mappa</strong> &#8594; info licenze per paese + tuoi spot<br><strong>5. Top</strong> &#8594; Hall of Fame, le catture migliori<br><strong>6. Esporta</strong> &#8594; CSV di tutte le catture'},
+    weer:{titel:'&#127768;&#65039; Meteo &amp; acqua (fonti gratuite)',nl:'Paesi Bassi',be:'Belgio',lux:'Lussemburgo',algemeen:'Vento &amp; pressione (Benelux)',
+      buienradar:'pioggia &amp; vento',knmi:'previsioni',waterinfoNl:'livello acqua &amp; maree',meteobe:'previsioni',waterinfoBe:'livello acqua',meteolux:'previsioni',windy:'vento, pressione, onde',windfinder:'vento per località'},
+    vangst:{tipsBtn:'&#128247; Consigli di determinazione &#8250;',soortLabel:'&#128031; Specie di pesce',onbekendHint:'Specie sconosciuta &#8594; condividi la foto con un\'app AI e incolla la risposta.',deelBtn:'&#8679; Condividi foto',kopieerBtn:'&#128203; Copia prompt',plakPh:'Incolla qui la risposta dell\'AI...',naamLabel:'Nome specie presunto:',naamPh:'es. Abramide',
+      schaalLabel:'&#128207; Riferimento di scala nella foto (opzionale)',schaalHint:'Per la lunghezza esatta: usa un metro a nastro e inseriscilo sotto. Non ce l\'hai a portata di mano? Metti questo nell\'inquadratura:',opnieuw:'&#8617; Di nuovo',
+      watertypeLabel:'Tipo di acqua',maatLabel:'Lunghezza (cm) &amp; peso (grammi, opzionale)',lengtePh:'Lunghezza cm',gewichtPh:'Peso g',
+      stromingLabel:'Corrente',helderheidLabel:'Limpidezza',waterLabel:'Acqua',vanafLabel:'Pescato da',bootPh:'es. nome noleggio, o barca a remi/motore propria',
+      moeilijkheidLabel:'Difficoltà della cattura',tegenstandLabel:'Resistenza del pesce',hengelLabel:'Canna',hengelPh:'es. canna da carpa 3.6m / canna da spinning',
+      aasLabel:'Esca',aasPh:'es. verme, esca artificiale, boilie, esche da traina',gpsLabel:'Posizione cattura',opslaanBtn:'&#10003; Salva cattura'},
+    schaal:{rolmaat:'Metro a nastro',lineaal:'Righello',sleutels:'Chiavi',bankpas:'Carta bancaria',hand:'Mano',geen:'Nessuno',customPh:'oppure scrivi tu, es. numero scarpa 43'},
+    chip:{zoet:'Acqua dolce',brak:'Acqua salmastra',zeewater:'Acqua di mare',stil:'Ferma',stromend:'Corrente',helder:'Limpida',troebel:'Torbida',klein:'Piccolo fiume/fosso',groot:'Grande fiume',meer:'Lago/laghetto',oever:'Riva',brug:'Ponte',boot:'Barca',makkelijk:'Facile',gemiddeld:'Media',moeilijk:'Difficile',weinig:'Poca',veel:'Molta'},
+    log:{vangsten:'catture',soorten:'specie',zwaarste:'g più pesante',kaartTitel:'Posizioni catture',kaartGeen:'&#128506;<br>Ancora nessun punto GPS',geen:'Ancora nessuna cattura in questa sessione'},
+    kaart:{vergunningTitel:'Licenze Benelux',nlTitel:'Paesi Bassi',nlTekst:'VISpas (nazionale, tramite le federazioni di pesca/sportvisserijnederland.nl) oppure Kleine VISpas per un\'acqua specifica. Controlla sempre la Lijst van Nederlandse Wateren — alcune acque hanno regole aggiuntive o divieto di pesca notturna.',
+      vlTitel:'Fiandre',vlTekst:'Licenza di pesca (tassa) tramite il governo fiammingo, più il permesso del proprietario/federazione (es. VVF Vlaanderen) per l\'acqua specifica.',
+      waTitel:'Vallonia',waTekst:'Permis de pêche tramite il Service Public de Wallonie, più eventualmente l\'iscrizione all\'associazione di pesca locale.',
+      luxTitel:'Lussemburgo',luxTekst:'Permis de pêche tramite l\'Administration de la nature et des forêts, insieme alla "carte de pêche" dell\'associazione competente.',
+      disclaimer:'&#9888; Le regole cambiano ogni anno &mdash; verifica sempre le condizioni attuali.',stekkenTitel:'I tuoi spot',spotNieuw:'Nuovo spot',spotGoed:'Buono spot',notitiePh:'nota, es. molti lucioperca avvistati',markeerBtn:'&#128205; Segna posizione attuale',geenStekken:'&#128506;<br>Ancora nessuno spot segnato'},
+    hof:{titel:'&#127942; Hall of Fame &mdash; catture migliori',geen:'Ancora nessuna cattura registrata'},
+    export:{csvTitel:'CSV &mdash; tutte le catture',csvDesc:'Per cattura: data, specie, tipo acqua, lunghezza, peso, posizione, condizioni, canna, esca, difficoltà, punteggio.⚠️ I nomi delle specie nel CSV sono sempre in olandese, anche se hai inserito la cattura in italiano — utile per dati coerenti, ma confronta tu stesso con un elenco delle specie.',csvBtn:'&#8595; Scarica CSV',
+      spotsTitel:'CSV &mdash; spot',spotsDesc:'Tutti i tuoi spot nuovi e buoni segnati, con GPS e note.',spotsBtn:'&#8595; Scarica spot',
+      sessieLabel:'Sessione attuale',wisSessie:'&#10005; Cancella sessione attuale',wisAlles:'&#10005; Cancella tutti i dati (incl. archivio e spot)'},
+    modal:{titel:'&#128247; Consigli di determinazione',kenmerkenTitel:'&#128269; Caratteristiche riconoscibili',kenmerkenTekst:'Fotografa il pesce di lato, interamente inquadrato. Osserva forma delle pinne, colore, muso e squame.',
+      maatTitel:'&#128207; Riferimento di scala',maatTekst:'Per una lunghezza esatta usa un metro a nastro. Non ce l\'hai a portata di mano? Metti in foto un oggetto riconoscibile (chiavi, carta, mano).',
+      twijfelTitel:'&#127754; Caso dubbio?',twijfelTekst:'Scegli "Sconosciuto / nuovo per me" nella specie — otterrai il flusso di determinazione AI.',terugBtn:'&#128247; Torna alla foto'},
+    notif:{vulLocatie:'Inserisci un nome di località',sessieGestart:'Sessione avviata',gpsZoeken:'Ricerca...',gpsBepaald:'GPS determinato \u2713',gpsMislukt:'GPS fallito',gpsGeweigerd:'Permesso negato',gpsGeenSignaal:'Segnale non trovato',gpsTimeout:'Timeout',
+      startSessieEerst:'Avvia prima una sessione',kiesSoort:'Scegli o inserisci una specie',kiesWatertype:'Scegli un tipo di acqua',vangstOpgeslagen:'Cattura salvata \u2713 (punteggio ',promptGekopieerd:'Prompt copiato \u2713',kopieerHandmatig:'Copia manualmente',makEerstFoto:'Scatta prima una foto',delenMislukt:'Condivisione fallita',fotoGedownload:'Foto scaricata \u2014 apri nell\'app AI',
+      stekGemarkeerd:'Spot segnato \u2713',geenVangsten:'Nessuna cattura',geenStekken:'Nessuno spot',csvGedownload:'CSV scaricato \u2713',stekkenGedownload:'Spot scaricati \u2713',sessieGewist:'Sessione cancellata',allesGewist:'Tutti i dati cancellati',
+      confirmWisSessie:'Cancellare la sessione e le catture attuali? Esporta prima!',confirmWisAlles:'Cancellare TUTTI i dati, incluso l\'archivio Hall of Fame e gli spot? Non può essere annullato.',cameraFout:'Fotocamera: '}
+  }
+};
+
+var DET_PROMPT = {
+  nl:'Begin your response with a short introduction line:\n"Analysis by: [your name and version]"\n\nYou are an expert fish identification assistant for Benelux (Netherlands, Belgium, Luxembourg) waters. Analyze this photo of a caught fish.\n\nProvide:\n\u2022 Scientific name\n\u2022 Dutch common name\n\u2022 Confidence (0-100%)\n\u2022 Distinguishing features you used\n\u2022 Whether this species is native, introduced, or protected in Benelux waters\n\nAnswer in Dutch.',
+  it:'Begin your response with a short introduction line:\n"Analysis by: [your name and version]"\n\nYou are an expert fish identification assistant for Benelux (Netherlands, Belgium, Luxembourg) waters. Analyze this photo of a caught fish.\n\nProvide:\n\u2022 Scientific name\n\u2022 Italian common name\n\u2022 Confidence (0-100%)\n\u2022 Distinguishing features you used\n\u2022 Whether this species is native, introduced, or protected in Benelux waters\n\nAnswer in Italian.'
+};
+
+var state = {sessie:null, vangsten:[], stream:null, huidigeFotoData:null, chips:{}, spots:[], spotType:'nieuw', schaal:'', lang:'nl'};
+
+function t(path){
+  var parts = path.split('.'); var obj = TR[state.lang];
+  for(var i=0;i<parts.length;i++){ if(!obj) return path; obj = obj[parts[i]]; }
+  return obj==null ? path : obj;
+}
+
+function toepassenTaal(){
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    el.innerHTML = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  document.querySelectorAll('.chip[data-w]').forEach(function(c){
+    var span = c.querySelector('span[data-i18n]');
+    if(span) span.innerHTML = t(span.getAttribute('data-i18n'));
+  });
+  document.getElementById('langBtn').textContent = state.lang==='nl' ? 'IT' : 'NL';
+  if(!state.sessie) document.getElementById('sessieLabel').innerHTML = t('header.geenSessie');
+  bouwSoortSelect();
+  updateLog(); renderHallOfFame(); renderSpotLijst(); updateSessieArchief();
+}
+function wisselTaal(){
+  state.lang = state.lang==='nl' ? 'it' : 'nl';
+  try{ localStorage.setItem('vislog_lang', state.lang); }catch(e){}
+  toepassenTaal();
+}
+
+window.addEventListener('load', function(){
+  document.getElementById('datumInput').value = new Date().toISOString().split('T')[0];
+  laadData();
+  try{ var savedLang = localStorage.getItem('vislog_lang'); if(savedLang) state.lang = savedLang; }catch(e){}
+  toepassenTaal();
+});
+
+function bouwSoortSelect(){
+  var sel = document.getElementById('soortSelect');
+  var huidige = sel.value;
+  var groepen = state.lang==='nl' ? {zoet:'Zoetwater',brak:'Brakwater',zee:'Zeewater'} : {zoet:'Acqua dolce',brak:'Acqua salmastra',zee:'Acqua di mare'};
+  var h = '<option value="">-- '+(state.lang==='nl'?'kies vissoort':'scegli specie')+' --</option>';
+  Object.keys(groepen).forEach(function(g){
+    h += '<optgroup label="'+groepen[g]+'">';
+    SOORTEN.filter(function(s){return s.type===g;}).forEach(function(s){ h += '<option value="'+s.naam+'">'+s.naam+'</option>'; });
+    h += '</optgroup>';
+  });
+  h += '<option value="__onbekend__">&#10067; '+(state.lang==='nl'?'Onbekend / nieuw voor mij':'Sconosciuto / nuovo per me')+'</option>';
+  sel.innerHTML = h;
+  if(huidige) sel.value = huidige;
+}
+
+function soortGewijzigd(){
+  var v = document.getElementById('soortSelect').value;
+  document.getElementById('onbekendBlok').style.display = (v==='__onbekend__') ? 'block' : 'none';
+  if(v && v!=='__onbekend__'){
+    var s = SOORTEN.find(function(x){return x.naam===v;});
+    if(s){
+      document.querySelectorAll('#watertypeChips .chip').forEach(function(c){c.classList.remove('actief');});
+      var target = document.querySelector('#watertypeChips .chip[data-w="'+s.type+'"]');
+      if(target){target.classList.add('actief'); state.chips.watertype = s.type;}
+    }
+  }
+}
+
+function toonScherm(naam){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('scherm-'+naam).classList.add('active');
+  var tabs = document.querySelectorAll('.tab');
+  ['start','vangst','log','kaart','hof','export'].forEach(function(n,i){ if(n===naam) tabs[i].classList.add('active'); });
+  if(naam==='vangst') startCamera(); else stopCamera();
+  if(naam==='log') updateLog();
+  if(naam==='kaart') { renderSpotLijst(); setTimeout(tekenSpotKaart,100); }
+  if(naam==='hof') renderHallOfFame();
+  if(naam==='export') updateSessieArchief();
+}
+
+function startSessie(){
+  var loc = document.getElementById('sessieLocatie').value.trim();
+  if(!loc){ toonNotif(t('notif.vulLocatie')); return; }
+  state.sessie = {id:Date.now(), visser:document.getElementById('visserNaam').value.trim()||'-', locatie:loc, datum:document.getElementById('datumInput').value, gps:document.getElementById('gpsDisplay').textContent};
+  slaData();
+  document.getElementById('sessieLabel').textContent = loc.substring(0,20)+(loc.length>20?'...':'');
+  toonScherm('vangst'); toonNotif(t('notif.sessieGestart'));
+}
+
+var startKaartObj = null, vangstFormKaartGps = '';
+function bepaalGPS(context){
+  var d, k;
+  if(context==='start'){ d=document.getElementById('gpsDisplay'); k=document.getElementById('gpsKnop'); }
+  else { d=document.getElementById('vangstGpsDisplay'); k=null; }
+  d.textContent=t('notif.gpsZoeken'); d.style.color='#e8a020'; if(k){k.innerHTML='&#9203;';k.disabled=true;}
+  if(!navigator.geolocation){ d.textContent='GPS n/a'; if(k){k.innerHTML='&#128205; GPS';k.disabled=false;} return; }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var c = pos.coords.latitude.toFixed(5)+', '+pos.coords.longitude.toFixed(5);
+    d.textContent=c; d.style.color='#7dcf75'; if(k){k.innerHTML='&#10003;';k.disabled=false;}
+    if(context==='start'){
+      if(state.sessie){ state.sessie.gps=c; slaData(); }
+      toonStartKaart(pos.coords.latitude, pos.coords.longitude);
+    } else {
+      vangstFormKaartGps = c;
+    }
+    toonNotif(t('notif.gpsBepaald'));
+  }, function(err){
+    d.style.color='#e87070'; if(k){k.innerHTML='&#128205; GPS';k.disabled=false;}
+    d.textContent = err.code===1?t('notif.gpsGeweigerd'):err.code===2?t('notif.gpsGeenSignaal'):t('notif.gpsTimeout');
+    toonNotif(t('notif.gpsMislukt'));
+  }, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+}
+function toonStartKaart(lat,lon){
+  var c = document.getElementById('startKaartContainer'); if(!c || typeof L==='undefined') return;
+  c.style.display='block';
+  if(startKaartObj){ startKaartObj.remove(); }
+  startKaartObj = L.map(c,{zoomControl:false,attributionControl:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(startKaartObj);
+  L.marker([lat,lon]).addTo(startKaartObj);
+  startKaartObj.setView([lat,lon],14);
+  setTimeout(function(){ if(startKaartObj) startKaartObj.invalidateSize(); },200);
+}
+
+function startCamera(){
+  if(state.stream) return;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}}).then(function(s){
+    state.stream=s; var v=document.getElementById('videoFeed'); v.srcObject=s; v.style.display='block';
+    document.getElementById('fotoPreview').style.display='none'; state.huidigeFotoData=null;
+  }).catch(function(e){ toonNotif(t('notif.cameraFout')+e.message); });
+}
+function stopCamera(){ if(state.stream){ state.stream.getTracks().forEach(function(t){t.stop();}); state.stream=null; } }
+function nieuweCamera(){ stopCamera(); state.huidigeFotoData=null; document.getElementById('fotoPreview').style.display='none'; document.getElementById('videoFeed').style.display='block'; startCamera(); }
+function maakFoto(){
+  var v=document.getElementById('videoFeed'), c=document.getElementById('fotoCanvas');
+  c.width=v.videoWidth||640; c.height=v.videoHeight||480; c.getContext('2d').drawImage(v,0,0);
+  state.huidigeFotoData=c.toDataURL('image/jpeg',0.82);
+  document.getElementById('fotoPreview').src=state.huidigeFotoData;
+  document.getElementById('fotoPreview').style.display='block';
+  document.getElementById('videoFeed').style.display='none';
+}
+
+function kiesChip(el,groep){
+  document.querySelectorAll('.chip[data-w]').forEach(function(c){ if(c.parentElement===el.parentElement) c.classList.remove('actief'); });
+  el.classList.add('actief'); state.chips[groep]=el.getAttribute('data-w');
+  if(groep==='vanaf'){ document.getElementById('bootDetailBlok').style.display = (el.getAttribute('data-w')==='boot') ? 'block' : 'none'; }
+}
+function kiesSchaalChip(el,waarde){
+  document.querySelectorAll('#schaalChips .chip').forEach(function(c){c.classList.remove('actief');});
+  el.classList.add('actief'); state.schaal = waarde; document.getElementById('schaalReferentie').value = waarde;
+}
+
+function openModal(){ document.getElementById('tipsModal').classList.add('open'); }
+function sluitModalDirect(){ document.getElementById('tipsModal').classList.remove('open'); }
+function sluitModal(e){ if(e.target===document.getElementById('tipsModal')) sluitModalDirect(); }
+
+function deelDeterminatieFoto(){
+  if(!state.huidigeFotoData){ toonNotif(t('notif.makEerstFoto')); return; }
+  var arr=state.huidigeFotoData.split(','), mime=arr[0].match(/:(.*?);/)[1], bstr=atob(arr[1]), n=bstr.length, u=new Uint8Array(n);
+  while(n--) u[n]=bstr.charCodeAt(n);
+  var blob=new Blob([u],{type:mime}), file=new File([blob],'vangst.jpg',{type:'image/jpeg'});
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({title:'VisLog', text:DET_PROMPT[state.lang], files:[file]}).catch(function(e){ if(e.name!=='AbortError') toonNotif(t('notif.delenMislukt')); });
+  } else {
+    var url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='vangst.jpg'; a.click();
+    toonNotif(t('notif.fotoGedownload'));
+  }
+}
+function kopieerDeterminatiePrompt(){
+  var txt = DET_PROMPT[state.lang];
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ toonNotif(t('notif.promptGekopieerd')); }).catch(function(){ _kopFb(txt); });
+  } else _kopFb(txt);
+}
+function _kopFb(tekst){ var el=document.createElement('textarea'); el.value=tekst; el.style.position='fixed'; el.style.opacity='0'; document.body.appendChild(el); el.focus(); el.select(); try{document.execCommand('copy'); toonNotif(t('notif.promptGekopieerd'));}catch(e){toonNotif(t('notif.kopieerHandmatig'));} document.body.removeChild(el); }
+
+function berekenScore(v){
+  var s = SOORTEN.find(function(x){return x.naam===v.soort;});
+  var factor = s ? s.factor : 2;
+  var moeilijkF = {makkelijk:1, gemiddeld:1.5, moeilijk:2}[v.moeilijkheid] || 1;
+  var tegenF = {weinig:1, gemiddeld:1.3, veel:1.6}[v.tegenstand] || 1;
+  var gewicht = parseFloat(v.gewicht) || 0;
+  return Math.round((gewicht/50) * factor * moeilijkF * tegenF);
+}
+
+function slaVangstOp(){
+  if(!state.sessie){ toonNotif(t('notif.startSessieEerst')); return; }
+  var soortSel = document.getElementById('soortSelect').value;
+  var soort = soortSel; var soortAI = '';
+  if(soortSel === '__onbekend__'){
+    soort = document.getElementById('onbekendSoortNaam').value.trim() || (state.lang==='nl'?'Onbekende soort':'Specie sconosciuta');
+    soortAI = document.getElementById('determinatieAntwoord').value.trim();
+  }
+  if(!soort){ toonNotif(t('notif.kiesSoort')); return; }
+  if(!state.chips.watertype){ toonNotif(t('notif.kiesWatertype')); return; }
+  var gps = vangstFormKaartGps || (state.sessie?state.sessie.gps:'') || '';
+  var v = {
+    nr: state.vangsten.length+1, timestamp:new Date().toISOString(), gps:gps,
+    foto:state.huidigeFotoData, soort:soort, onbekend:(soortSel==='__onbekend__'), determinatieRauw:soortAI,
+    watertype:state.chips.watertype, lengte:document.getElementById('lengteInp').value, gewicht:document.getElementById('gewichtInp').value,
+    schaal: document.getElementById('schaalReferentie').value.trim(),
+    stroming:state.chips.stroming||'', helderheid:state.chips.helderheid||'', watergrootte:state.chips.watergrootte||'',
+    vanaf:state.chips.vanaf||'', bootDetail: (state.chips.vanaf==='boot') ? document.getElementById('bootDetailInp').value.trim() : '',
+    moeilijkheid:state.chips.moeilijkheid||'', tegenstand:state.chips.tegenstand||'',
+    hengel:document.getElementById('hengelInp').value.trim(), aas:document.getElementById('aasInp').value.trim()
+  };
+  v.score = berekenScore(v);
+  state.vangsten.push(v); slaData();
+  ['lengteInp','gewichtInp','hengelInp','aasInp','onbekendSoortNaam','determinatieAntwoord','schaalReferentie','bootDetailInp'].forEach(function(id){document.getElementById(id).value='';});
+  document.querySelectorAll('.chip[data-w]').forEach(function(c){c.classList.remove('actief');});
+  state.chips = {}; state.schaal=''; vangstFormKaartGps='';
+  document.getElementById('soortSelect').value=''; document.getElementById('onbekendBlok').style.display='none'; document.getElementById('bootDetailBlok').style.display='none';
+  document.getElementById('vangstGpsDisplay').textContent = t('start.gpsNietbepaald');
+  nieuweCamera();
+  toonNotif(t('notif.vangstOpgeslagen')+v.score+')');
+}
+
+function updateLog(){
+  var el = document.getElementById('logLijst');
+  document.getElementById('totaalVangsten').textContent = state.vangsten.length;
+  var soorten = {}; var zwaarste = 0;
+  state.vangsten.forEach(function(v){ soorten[v.soort]=true; var g=parseFloat(v.gewicht)||0; if(g>zwaarste) zwaarste=g; });
+  document.getElementById('totaalSoorten').textContent = Object.keys(soorten).length;
+  document.getElementById('beteZwaarste').textContent = zwaarste;
+  tekenVangstKaart();
+  if(!state.vangsten.length){ el.innerHTML='<div style="font-size:.75rem;color:#5a90a5;text-align:center;padding:20px">'+t('log.geen')+'</div>'; return; }
+  var h='';
+  state.vangsten.slice().reverse().forEach(function(v){
+    h += '<div class="vangst-item">';
+    h += v.foto ? '<img class="vangst-thumb" src="'+v.foto+'">' : '<div class="vangst-thumb-ph">&#128031;</div>';
+    h += '<div class="vangst-info"><div class="vangst-soort">'+esc(v.soort)+'</div>';
+    h += '<div class="vangst-meta">'+(v.lengte?v.lengte+' cm &middot; ':'')+(v.gewicht?v.gewicht+' g':'')+(v.schaal?' &middot; &#128207; '+esc(v.schaal):'')+'</div>';
+    if(v.bootDetail) h += '<div class="vangst-meta">&#128674; '+esc(v.bootDetail)+'</div>';
+    h += '<span class="badge badge-'+(v.watertype||'onbekend')+'">'+(v.watertype||'?')+'</span>';
+    h += '<span class="badge badge-score">'+v.score+'</span>';
+    if(v.onbekend) h += '<span class="badge badge-onbekend">AI</span>';
+    h += '</div></div>';
+  });
+  el.innerHTML = h;
+}
+
+var vangstKaartObj = null;
+function tekenVangstKaart(){
+  var c = document.getElementById('vangstKaartContainer'); if(!c) return;
+  if(vangstKaartObj){ vangstKaartObj.remove(); vangstKaartObj=null; }
+  var punten = state.vangsten.filter(function(v){ return v.gps && v.gps.indexOf(',')!==-1; });
+  if(!punten.length){ c.innerHTML='<div class="kaart-geen">'+t('log.kaartGeen')+'</div>'; return; }
+  c.innerHTML='';
+  if(typeof L==='undefined'){ c.innerHTML='<div class="kaart-geen">&#9888; no internet</div>'; return; }
+  vangstKaartObj = L.map(c,{zoomControl:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'\u00a9 OpenStreetMap'}).addTo(vangstKaartObj);
+  var coords=[];
+  punten.forEach(function(v){
+    var pts=v.gps.split(','), lat=parseFloat(pts[0]), lon=parseFloat(pts[1]);
+    if(isNaN(lat)||isNaN(lon)) return; coords.push([lat,lon]);
+    var ic = L.divIcon({className:'',html:'<div style="background:#2e86ab;color:#fff;border:2px solid #fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.5)">&#128031;</div>',iconSize:[28,28],iconAnchor:[14,14]});
+    L.marker([lat,lon],{icon:ic}).addTo(vangstKaartObj).bindPopup('<b>'+esc(v.soort)+'</b><br>'+(v.lengte?v.lengte+' cm':''));
+  });
+  if(coords.length===1) vangstKaartObj.setView(coords[0],14);
+  else if(coords.length>1) vangstKaartObj.fitBounds(L.latLngBounds(coords),{padding:[40,40],maxZoom:16});
+  setTimeout(function(){ if(vangstKaartObj) vangstKaartObj.invalidateSize(); },200);
+}
+
+function kiesSpotType(type){
+  state.spotType = type;
+  document.getElementById('spotNieuwBtn').classList.toggle('actief-nieuw', type==='nieuw');
+  document.getElementById('spotGoedBtn').classList.toggle('actief-goed', type==='goed');
+}
+function markeerSpot(){
+  if(!navigator.geolocation){ toonNotif(t('notif.gpsMislukt')); return; }
+  toonNotif(t('notif.gpsZoeken'));
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var spot = {id:Date.now(), type:state.spotType, gps:pos.coords.latitude.toFixed(5)+', '+pos.coords.longitude.toFixed(5),
+      notitie:document.getElementById('spotNotitie').value.trim(), timestamp:new Date().toISOString()};
+    state.spots.push(spot); slaData();
+    document.getElementById('spotNotitie').value='';
+    renderSpotLijst(); tekenSpotKaart();
+    toonNotif(t('notif.stekGemarkeerd'));
+  }, function(){ toonNotif(t('notif.gpsMislukt')); }, {enableHighAccuracy:true, timeout:10000});
+}
+function verwijderSpot(id){
+  state.spots = state.spots.filter(function(s){return s.id!==id;});
+  slaData(); renderSpotLijst(); tekenSpotKaart();
+}
+function renderSpotLijst(){
+  var el = document.getElementById('spotLijst'); if(!el) return;
+  if(!state.spots.length){ el.innerHTML=''; return; }
+  var h='';
+  state.spots.slice().reverse().forEach(function(s){
+    h += '<div class="vangst-item"><div class="vangst-thumb-ph">'+(s.type==='goed'?'&#11088;':'&#128204;')+'</div>';
+    h += '<div class="vangst-info"><div class="vangst-soort" style="font-style:normal;font-size:.78rem">'+(s.type==='goed'?t('kaart.spotGoed'):t('kaart.spotNieuw'))+'</div>';
+    h += '<div class="vangst-meta">'+esc(s.notitie||'')+'<br>'+s.gps+'</div></div>';
+    h += '<button class="btn-reset" onclick="verwijderSpot('+s.id+')">&#10005;</button></div>';
+  });
+  el.innerHTML = h;
+}
+var spotKaartObj = null;
+function tekenSpotKaart(){
+  if(spotKaartObj){ spotKaartObj.remove(); spotKaartObj=null; }
+  var c = document.getElementById('kaartContainer'); if(!c) return;
+  if(!state.spots.length){ c.innerHTML='<div class="kaart-geen">'+t('kaart.geenStekken')+'</div>'; return; }
+  c.innerHTML='';
+  if(typeof L==='undefined'){ c.innerHTML='<div class="kaart-geen">&#9888; no internet</div>'; return; }
+  spotKaartObj = L.map(c,{zoomControl:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'\u00a9 OpenStreetMap'}).addTo(spotKaartObj);
+  var coords=[];
+  state.spots.forEach(function(s){
+    var pts=s.gps.split(','), lat=parseFloat(pts[0]), lon=parseFloat(pts[1]);
+    if(isNaN(lat)||isNaN(lon)) return; coords.push([lat,lon]);
+    var kl = s.type==='goed' ? '#3a7d34' : '#2e86ab';
+    var ic = L.divIcon({className:'',html:'<div style="background:'+kl+';color:#fff;border:2px solid #fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.5)">'+(s.type==='goed'?'\u2605':'\u{1F4CD}')+'</div>',iconSize:[30,30],iconAnchor:[15,15]});
+    L.marker([lat,lon],{icon:ic}).addTo(spotKaartObj).bindPopup('<b>'+(s.type==='goed'?t('kaart.spotGoed'):t('kaart.spotNieuw'))+'</b><br>'+esc(s.notitie||''));
+  });
+  if(coords.length===1) spotKaartObj.setView(coords[0],15);
+  else if(coords.length>1) spotKaartObj.fitBounds(L.latLngBounds(coords),{padding:[40,40],maxZoom:16});
+  setTimeout(function(){ if(spotKaartObj) spotKaartObj.invalidateSize(); },200);
+}
+
+function renderHallOfFame(){
+  var el = document.getElementById('hofLijst'); if(!el) return;
+  var alle = state.vangsten.slice().sort(function(a,b){ return b.score - a.score; }).slice(0,25);
+  if(!alle.length){ el.innerHTML='<div style="font-size:.75rem;color:#5a90a5;text-align:center;padding:20px">'+t('hof.geen')+'</div>'; return; }
+  var h='';
+  alle.forEach(function(v,i){
+    var rankCls = i===0?'top1':i===1?'top2':i===2?'top3':'';
+    h += '<div class="hof-item"><div class="hof-rank '+rankCls+'">'+(i+1)+'</div>';
+    if(v.foto) h += '<img class="vangst-thumb" src="'+v.foto+'">'; else h += '<div class="vangst-thumb-ph">&#128031;</div>';
+    h += '<div class="vangst-info"><div class="vangst-soort">'+esc(v.soort)+'</div>';
+    h += '<div class="vangst-meta">'+(v.lengte?v.lengte+' cm &middot; ':'')+(v.gewicht?v.gewicht+' g':'')+' &middot; '+(v.timestamp?v.timestamp.substring(0,10):'')+'</div>';
+    h += '<span class="badge badge-score">'+v.score+'</span></div></div>';
+  });
+  el.innerHTML = h;
+}
+
+function esc(t){ return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function exporteerCSV(){
+  if(!state.vangsten.length){ toonNotif(t('notif.geenVangsten')); return; }
+  var rijen = [['Visser','Sessie','Datum','Tijd','Soort','Onbekend/AI','Watertype','Lengte cm','Gewicht g','Schaalreferentie','GPS','Stroming','Helderheid','Watergrootte','Vanaf','Boot detail','Moeilijkheid','Tegenstand','Hengel','Aas','Score']];
+  state.vangsten.forEach(function(v){
+    var dt = v.timestamp ? v.timestamp.split('T') : ['',''];
+    rijen.push([state.sessie?state.sessie.visser:'', state.sessie?state.sessie.locatie:'', dt[0], dt[1]?dt[1].substring(0,5):'',
+      v.soort, v.onbekend?'ja':'nee', v.watertype, v.lengte, v.gewicht, v.schaal, v.gps, v.stroming, v.helderheid, v.watergrootte, v.vanaf, v.bootDetail, v.moeilijkheid, v.tegenstand, v.hengel, v.aas, v.score]);
+  });
+  var csv = rijen.map(function(r){ return r.map(function(c){ return '"'+(c+'').replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = 'vislog_'+(state.sessie?state.sessie.datum:'export')+'.csv';
+  a.click(); toonNotif(t('notif.csvGedownload'));
+}
+function exporteerSpots(){
+  if(!state.spots.length){ toonNotif(t('notif.geenStekken')); return; }
+  var rijen = [['Type','GPS','Notitie','Datum']];
+  state.spots.forEach(function(s){ rijen.push([s.type, s.gps, s.notitie, s.timestamp?s.timestamp.substring(0,10):'']); });
+  var csv = rijen.map(function(r){ return r.map(function(c){ return '"'+(c+'').replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = 'vislog_stekken.csv'; a.click(); toonNotif(t('notif.stekkenGedownload'));
+}
+
+function slaData(){
+  try{
+    localStorage.setItem('vislog_sessie', JSON.stringify(state.sessie));
+    var m = state.vangsten.map(function(v){ var c={}; for(var k in v) c[k]=v[k]; c.foto = v.foto?'aanwezig':null; return c; });
+    localStorage.setItem('vislog_vangsten_meta', JSON.stringify(m));
+    state.vangsten.forEach(function(v,i){ if(v.foto) try{ localStorage.setItem('vislog_foto_'+i, v.foto); }catch(e){} });
+    localStorage.setItem('vislog_spots', JSON.stringify(state.spots));
+  }catch(e){}
+}
+function laadData(){
+  try{
+    var s = localStorage.getItem('vislog_sessie');
+    if(s){ state.sessie = JSON.parse(s); if(state.sessie){
+      document.getElementById('visserNaam').value = state.sessie.visser||'';
+      document.getElementById('sessieLocatie').value = state.sessie.locatie||'';
+      document.getElementById('datumInput').value = state.sessie.datum||new Date().toISOString().split('T')[0];
+      document.getElementById('gpsDisplay').textContent = state.sessie.gps||'Nog niet bepaald';
+      document.getElementById('sessieLabel').textContent = (state.sessie.locatie||'').substring(0,20);
+    }}
+    var vm = localStorage.getItem('vislog_vangsten_meta');
+    if(vm){ state.vangsten = JSON.parse(vm).map(function(v,i){ if(v.foto==='aanwezig') v.foto = localStorage.getItem('vislog_foto_'+i)||null; return v; }); }
+    var sp = localStorage.getItem('vislog_spots');
+    if(sp){ state.spots = JSON.parse(sp); }
+  }catch(e){}
+}
+function updateSessieArchief(){
+  var el = document.getElementById('sessieArchief'); if(!el) return;
+  if(state.sessie){ el.innerHTML = '<div style="color:var(--wit);margin-bottom:4px">'+esc(state.sessie.locatie)+'</div><div>'+state.sessie.datum+' &mdash; '+state.vangsten.length+'</div>'; }
+  else el.textContent = state.lang==='nl' ? 'Geen sessie actief' : 'Nessuna sessione attiva';
+}
+function verwijderSessie(){
+  if(!confirm(t('notif.confirmWisSessie'))) return;
+  state.sessie=null; state.vangsten=[];
+  localStorage.removeItem('vislog_sessie'); localStorage.removeItem('vislog_vangsten_meta');
+  document.getElementById('sessieLabel').innerHTML = t('header.geenSessie');
+  updateLog(); updateSessieArchief(); toonNotif(t('notif.sessieGewist'));
+}
+function verwijderAlles(){
+  if(!confirm(t('notif.confirmWisAlles'))) return;
+  var savedLang = state.lang;
+  state = {sessie:null, vangsten:[], stream:null, huidigeFotoData:null, chips:{}, spots:[], spotType:'nieuw', schaal:'', lang:savedLang};
+  localStorage.clear();
+  try{ localStorage.setItem('vislog_lang', savedLang); }catch(e){}
+  document.getElementById('sessieLabel').innerHTML = t('header.geenSessie');
+  updateLog(); updateSessieArchief(); renderSpotLijst(); toonNotif(t('notif.allesGewist'));
+}
+
+function toonNotif(txt){ var n=document.getElementById('notif'); n.textContent=txt; n.classList.add('zichtbaar'); setTimeout(function(){n.classList.remove('zichtbaar');},2400); }
+</script>
+
+<!-- ① ZICHTBARE FOOTER -->
+<div id="jdh-copyright-footer" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.82);color:#ccc;font-size:11px;text-align:center;padding:4px 8px;z-index:99999;font-family:sans-serif;letter-spacing:0.3px;user-select:none;">
+  © <span id="jdh-year"></span> Jan den Hollander &nbsp;|&nbsp;
+  <span id="jdh-project-title" style="color:#7eb8f7"></span> &nbsp;|&nbsp;
+  Vrij gebruik · niet-commercieel · ongewijzigd &nbsp;|&nbsp;
+  <span style="color:#aaa; cursor:pointer; text-decoration:underline" onclick="document.getElementById('jdh-modal').style.display='flex'">ℹ️ Licentie</span>
+</div>
+
+<!-- ② LICENTIE MODAL -->
+<div id="jdh-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999999; align-items:center; justify-content:center;">
+  <div style="background:#1a1a2e; color:#e0e0e0; border:1px solid #444; border-radius:10px; max-width:480px; width:90%; padding:24px; font-family:sans-serif; font-size:13px; line-height:1.6;">
+    <h3 style="color:#7eb8f7; margin-top:0">© Jan den Hollander &nbsp;·&nbsp; <span id="jdh-modal-title" style="font-weight:normal;font-size:12px"></span></h3>
+    <p>Dit hulpmiddel is <strong>gratis</strong> en mag vrij worden gedeeld, uitsluitend <strong>ongewijzigd</strong> en voor <strong>niet-commerciële</strong> doeleinden, met bronvermelding.</p>
+    <p>Commercieel gebruik, wijziging of verkoop is <strong>verboden</strong> zonder schriftelijke toestemming. Het gebruik van naam of projecttitel impliceert geen toestemming en vormt bij commercieel gebruik een zelfstandige auteursrechtinbreuk.</p>
+    <p style="color:#aaa;font-size:11px">This tool is free and may be shared freely, unmodified, for non-commercial purposes only, with attribution.<br><br>Quest'opera è gratuita e può essere condivisa liberamente, senza modifiche, per scopi non commerciali, con attribuzione.</p>
+    <p style="margin-bottom:4px">📧 <a href="mailto:jandenhollander@duck.com" style="color:#7eb8f7">jandenhollander@duck.com</a></p>
+    <p style="margin-top:4px;margin-bottom:0">🔗 <a href="https://github.com/Jan-den-Hollander" target="_blank" style="color:#7eb8f7">github.com/Jan-den-Hollander</a></p>
+    <button onclick="document.getElementById('jdh-modal').style.display='none'" style="margin-top:16px;padding:8px 20px;background:#7eb8f7;color:#000;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">Sluiten</button>
+  </div>
+</div>
+
+<!-- ③ INTEGRITEITSCHECK + URL-CHECK -->
+<script>
+(function() {
+  'use strict';
+  var projectName = document.title || 'Onbekend project';
+  var yearEl = document.getElementById('jdh-year'); if (yearEl) yearEl.textContent = new Date().getFullYear();
+  var titleEl = document.getElementById('jdh-project-title'); if (titleEl) titleEl.textContent = projectName;
+  var modalTitleEl = document.getElementById('jdh-modal-title'); if (modalTitleEl) modalTitleEl.textContent = projectName;
+
+  // ── URL-check: toegestane domeinen voor VisLog ──────────────────────
+  var ALLOWED = [
+    'localhost','127.0.0.1',
+    'jan-den-hollander.github.io',
+    'vis-log-pesce.vercel.app',
+    'vislog.vercel.app',
+    'vislog',
+    'claude.ai','stackblitz.io','stackblitz.com'
+  ];
+
+  function domainAllowed() {
+    var host = window.location.hostname.toLowerCase();
+    var proto = window.location.protocol;
+    if (proto === 'file:' || proto === 'content:') return true;
+    if (!host || host === '') return true;
+    return ALLOWED.some(function(a) {
+      return host === a || host.endsWith('.' + a) || host.indexOf(a) !== -1;
+    });
+  }
+
+  function warnDomain() {
+    var banner = document.createElement('div');
+    banner.id = 'jdh-domain-warning';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99998;background:#8a2010;color:#fff;font-family:sans-serif;font-size:12px;text-align:center;padding:8px 12px;line-height:1.5;';
+    banner.innerHTML = '⚠️ <strong>' + projectName + '</strong> draait op een niet-erkend domein (<em>' + window.location.hostname + '</em>). Origineel: <a href="https://github.com/Jan-den-Hollander" target="_blank" style="color:#ffccaa">github.com/Jan-den-Hollander</a> · <a href="mailto:jandenhollander@duck.com" style="color:#ffccaa">jandenhollander@duck.com</a>';
+    document.body.insertBefore(banner, document.body.firstChild);
+  }
+
+  if (!domainAllowed()) { setTimeout(warnDomain, 800); }
+
+  function blockApp() {
+    document.body.innerHTML = '';
+    document.body.style.cssText = 'margin:0;background:#111;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;';
+    document.body.innerHTML =
+      '<div style="text-align:center;color:#e55;max-width:440px;padding:24px">' +
+      '<div style="font-size:52px">⛔</div>' +
+      '<h2 style="color:#e55;margin:12px 0 8px">Toegang geblokkeerd</h2>' +
+      '<p style="color:#ddd;font-size:14px">De copyright-informatie van <strong style="color:#7eb8f7">' + projectName + '</strong> is verwijderd of gewijzigd.</p>' +
+      '<hr style="border-color:#333;margin:16px 0">' +
+      '<p style="color:#ccc;font-size:13px">© Jan den Hollander</p>' +
+      '<p><a href="mailto:jandenhollander@duck.com" style="color:#7eb8f7;font-size:12px">jandenhollander@duck.com</a></p>' +
+      '<p><a href="https://github.com/Jan-den-Hollander" target="_blank" style="color:#7eb8f7;font-size:12px">🔗 github.com/Jan-den-Hollander</a></p>' +
+      '</div>';
+  }
+
+  function checkIntegrity() {
+    var footer = document.getElementById('jdh-copyright-footer');
+    var modal  = document.getElementById('jdh-modal');
+    if (!footer || !modal) { blockApp(); return; }
+    var fs = window.getComputedStyle(footer);
+    if (fs.display === 'none' || fs.visibility === 'hidden' || fs.opacity === '0') {
+      footer.style.cssText += ';display:block!important;visibility:visible!important;opacity:1!important';
+    }
+  }
+
+  checkIntegrity();
+  setInterval(checkIntegrity, 3000);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.removedNodes.forEach(function(node) {
+        if (node.id === 'jdh-copyright-footer' || node.id === 'jdh-modal') blockApp();
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
+</body>
+</html>
